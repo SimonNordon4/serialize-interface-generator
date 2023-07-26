@@ -7,7 +7,7 @@ namespace SerializeInterface.Samples
     {
         [SerializeInterface] private IFoo _foo;
         [SerializeInterface] private IBar _bar;
-
+        
         private void Start()
         { 
             _foo.PrintFooValue();
