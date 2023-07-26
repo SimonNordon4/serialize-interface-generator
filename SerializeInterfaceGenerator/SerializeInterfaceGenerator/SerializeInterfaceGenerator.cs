@@ -13,14 +13,14 @@ internal sealed class SerializedInterfaceGenerator : ISourceGenerator
 using System;
 
 [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-public sealed class SerializeInterface2Attribute : Attribute
+public sealed class SerializeInterfaceAttribute : Attribute
 {
 }";
     
     public void Initialize(GeneratorInitializationContext context)
     {
-        // context.RegisterForPostInitialization
-        //     (i => i.AddSource("SerializeInterfaceAttribute_g.cs", AttributeText));
+        context.RegisterForPostInitialization
+            (i => i.AddSource("SerializeInterfaceAttribute_g.cs", AttributeText));
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
