@@ -4,6 +4,7 @@ namespace SerializeInterface.Samples
 {
     public class BarMonoBehaviour : MonoBehaviour, IBar
     {
+
         [field:SerializeField]
         public string BarMessage { get; private set; }
         public void PrintBarMessage()

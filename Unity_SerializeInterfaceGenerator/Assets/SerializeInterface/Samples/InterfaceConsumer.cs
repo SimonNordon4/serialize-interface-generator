@@ -11,7 +11,7 @@ namespace SerializeInterface.Samples
         private IBar _bar;
 
         private void Start()
-        {
+        { 
             _foo.PrintFooValue();
             _bar.PrintBarMessage();
         }

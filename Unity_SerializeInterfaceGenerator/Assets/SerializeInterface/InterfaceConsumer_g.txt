@@ -1,0 +1,13 @@
+using UnityEngine;
+namespace SerializeInterface.Samples{
+public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver
+{
+    [SerializeField]private MonoBehaviour TestObject;
+    public void OnBeforeSerialize()
+    {
+    }
+    public void OnAfterDeserialize()
+    {
+    }
+}
+}
