@@ -1,5 +1,5 @@
 using UnityEngine;
-public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver
+public partial class PrefabInterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField]private MonoBehaviour TestObject;
     public void OnBeforeSerialize()

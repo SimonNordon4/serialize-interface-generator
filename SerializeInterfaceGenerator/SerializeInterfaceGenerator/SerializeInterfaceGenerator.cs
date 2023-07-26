@@ -163,7 +163,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 source.AppendLine("{");
             }
             
-            source.AppendLine("public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver");
+            source.AppendLine($"public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver");
             source.AppendLine("{");
             source.AppendLine("    [SerializeField]private MonoBehaviour TestObject;");
             source.AppendLine("    public void OnBeforeSerialize()");
