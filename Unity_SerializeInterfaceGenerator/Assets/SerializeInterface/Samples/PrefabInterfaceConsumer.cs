@@ -5,16 +5,14 @@ using UnityEngine;
     {
         [SerializeInterface]
         private IFoo _fooPrefab;
-        //[SerializeInterface]
+        [SerializeInterface]
         private IBar _barPrefab;
         private void Start()
         {
-            // You can choose to instantiate an interface the traditional way,
-            // but you will need to check if it's a mono behaviour first.
-            if (_fooPrefab is MonoBehaviour fooMono)
-            {
-                var foo = Instantiate(fooMono) as IFoo;
-                foo.PrintFooValue();
-            }
+            var foo = InstantiateInterface(_fooPrefab);
+            var bar = InstantiateInterface(_barPrefab);
+            
+            foo.PrintFooValue();
+            bar.PrintBarMessage();
         }
     }

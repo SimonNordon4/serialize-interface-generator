@@ -138,6 +138,8 @@ internal class SerializeInterfaceAttribute : Attribute
 
         foreach (var classDeclaration in receiver.Classes)
         {
+            var interfaces = new HashSet<string>();
+
             var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
             var fields = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
                 .Where(f => f.AttributeLists.Any(
@@ -180,6 +182,8 @@ internal class SerializeInterfaceAttribute : Attribute
                 
                 source.AppendLine(
                     $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
+                
+                interfaces.Add(interfaceFullName);
             }
 
             source.AppendLine("    public void OnBeforeSerialize()");
@@ -198,6 +202,24 @@ internal class SerializeInterfaceAttribute : Attribute
             source.AppendLine("    public void OnAfterDeserialize()");
             source.AppendLine("    {");
             source.AppendLine("    }");
+            
+            // Now add the InstantiateInterface method for each interface
+            foreach (var @interface in interfaces)
+            {
+                // Generate the method for the interface
+                source.AppendLine($"    private {@interface} InstantiateInterface({@interface} instance)");
+                source.AppendLine("    {");
+                source.AppendLine("        if (instance is MonoBehaviour monoInterface)");
+                source.AppendLine($"            return Object.Instantiate(monoInterface) as {@interface};");
+                source.AppendLine("        if (instance == null)");
+                source.AppendLine("        {");
+                source.AppendLine("            Debug.LogError(\"Attempted to instantiate interface with null instance!\", this);");
+                source.AppendLine("            return null;");
+                source.AppendLine("        }");
+                source.AppendLine($"        Debug.LogError($\"Attempted to instantiate interface {@interface}, but it is not a MonoBehaviour!\", this);");
+                source.AppendLine("        return null;");
+                source.AppendLine("    }");
+            }
             
             source.AppendLine("}");
 
