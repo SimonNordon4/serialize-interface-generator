@@ -28,109 +28,8 @@ internal class SerializeInterfaceAttribute : Attribute
 
     public void Execute(GeneratorExecutionContext context)
     {
-        //Generate(context);
         GenerateTest(context);
     } 
-    
-    private void Generate(GeneratorExecutionContext context)
-    {
-        // Create a HashSet to store the names of the interfaces
-        HashSet<string> interfaces = new HashSet<string>();
-
-        if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
-            return;
-
-        foreach (var classDeclaration in receiver.Classes)
-        {
-            var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-            var fields = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                .Where(f => f.AttributeLists.Any(
-                    a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")));
-
-            if (!fields.Any())
-                continue;
-
-            var namespaceDeclaration = classDeclaration.AncestorsAndSelf().OfType<NamespaceDeclarationSyntax>()
-                .FirstOrDefault();
-            var namespaceName = namespaceDeclaration?.Name.ToString();
-
-            var source = new StringBuilder();
-            if (!string.IsNullOrEmpty(namespaceName))
-            {
-                source.AppendLine($"namespace {namespaceName}");
-                source.AppendLine("{");
-            }
-
-            source.AppendLine("using UnityEngine;");
-            source.AppendLine("using SerializeInterface;");
-            source.AppendLine(
-                $"public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver");
-            source.AppendLine("{");
-
-            foreach (var field in fields)
-            {
-                var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
-                var interfaceNamespace = symbol.Type.ContainingNamespace.ToDisplayString();
-                var interfaceFullName =
-                    !string.IsNullOrEmpty(interfaceNamespace) && interfaceNamespace != "<global namespace>"
-                        ? interfaceNamespace + "." + symbol.Type.Name
-                        : symbol.Type.Name;
-                source.AppendLine(
-                    $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
-
-                if (!interfaces.Contains(interfaceFullName))
-                {
-                    // Add the interface to the HashSet
-                    interfaces.Add(interfaceFullName);
-
-                    // Generate the method for the interface
-                    source.AppendLine(
-                        $"    public {interfaceFullName} InstantiateInterface({interfaceFullName} instance)");
-                    source.AppendLine("    {");
-                    source.AppendLine(
-                        $"        if (instance is MonoBehaviour {field.Declaration.Variables.First().Identifier.Text}_mono)");
-                    source.AppendLine(
-                        $"            return Object.Instantiate({field.Declaration.Variables.First().Identifier.Text}_mono) as {interfaceFullName};");
-                    source.AppendLine(
-                        $"        Debug.LogError($\"Attempted to instantiate interface {interfaceFullName}, but it is not a MonoBehaviour!\", this);");
-                    source.AppendLine("        return null;");
-                    source.AppendLine("    }");
-                }
-            }
-
-            source.AppendLine("    public void OnAfterDeserialize()");
-            source.AppendLine("    {");
-
-            foreach (var field in fields)
-            {
-                var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
-                source.AppendLine(
-                    $"        {field.Declaration.Variables.First().Identifier.Text} = {field.Declaration.Variables.First().Identifier.Text}_Object as {symbol.Type};");
-            }
-
-            source.AppendLine("    }");
-
-            source.AppendLine("    public void OnBeforeSerialize()");
-            source.AppendLine("    {");
-            source.AppendLine("    }");
-
-            source.AppendLine("}");
-
-            if (!string.IsNullOrEmpty(namespaceName))
-            {
-                source.AppendLine("}");
-            }
-
-            // output the source to a text file
-            const string path =
-                @"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Generated\";
-            System.IO.File.WriteAllText($"{path}{classDeclaration.Identifier.Text}_g.txt", source.ToString());
-
-            context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
-                SourceText.From(source.ToString(), Encoding.UTF8));
-        }
-    }
-
     private void GenerateTest(GeneratorExecutionContext context)
     {
         if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
@@ -188,7 +87,11 @@ internal class SerializeInterfaceAttribute : Attribute
 
             source.AppendLine("    public void OnBeforeSerialize()");
             source.AppendLine("    {");
-
+            source.AppendLine("    }");
+            
+            // We have to implement this because Unity didn't follow SOLID.
+            source.AppendLine("    public void OnAfterDeserialize()");
+            source.AppendLine("    {");
             // Generate the code to assign the backing fields to the interface fields on BeforeSerialize
             foreach (var field in fields)
             {
@@ -196,11 +99,6 @@ internal class SerializeInterfaceAttribute : Attribute
                 source.AppendLine(
                     $"        {field.Declaration.Variables.First().Identifier.Text} = {field.Declaration.Variables.First().Identifier.Text}_Object as {symbol.Type};");
             }
-            source.AppendLine("    }");
-            
-            // We have to implement this because Unity didn't follow SOLID.
-            source.AppendLine("    public void OnAfterDeserialize()");
-            source.AppendLine("    {");
             source.AppendLine("    }");
             
             // Now add the InstantiateInterface method for each interface

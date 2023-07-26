@@ -1,0 +1,39 @@
+using UnityEngine;
+using SerializeInterface;
+public partial class PrefabInterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
+{
+    [SerializeField, ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private Object _fooPrefab_Object;
+    [SerializeField, ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private Object _barPrefab_Object;
+    public void OnBeforeSerialize()
+    {
+    }
+    public void OnAfterDeserialize()
+    {
+        _fooPrefab = _fooPrefab_Object as SerializeInterface.Samples.IFoo;
+        _barPrefab = _barPrefab_Object as SerializeInterface.Samples.IBar;
+    }
+    private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
+    {
+        if (instance is MonoBehaviour monoInterface)
+            return Object.Instantiate(monoInterface) as SerializeInterface.Samples.IFoo;
+        if (instance == null)
+        {
+            Debug.LogError("Attempted to instantiate interface with null instance!", this);
+            return null;
+        }
+        Debug.LogError($"Attempted to instantiate interface SerializeInterface.Samples.IFoo, but it is not a MonoBehaviour!", this);
+        return null;
+    }
+    private SerializeInterface.Samples.IBar InstantiateInterface(SerializeInterface.Samples.IBar instance)
+    {
+        if (instance is MonoBehaviour monoInterface)
+            return Object.Instantiate(monoInterface) as SerializeInterface.Samples.IBar;
+        if (instance == null)
+        {
+            Debug.LogError("Attempted to instantiate interface with null instance!", this);
+            return null;
+        }
+        Debug.LogError($"Attempted to instantiate interface SerializeInterface.Samples.IBar, but it is not a MonoBehaviour!", this);
+        return null;
+    }
+}
