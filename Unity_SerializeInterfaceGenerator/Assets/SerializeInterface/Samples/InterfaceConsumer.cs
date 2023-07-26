@@ -8,6 +8,11 @@ namespace SerializeInterface.Samples
         [SerializeInterface] private IFoo _foo;
         [SerializeInterface] private IBar _bar;
 
+        private void Awake()
+        {
+           // OnBeforeSerialize();
+        }
+
         private void Start()
         { 
             _foo.PrintFooValue();

@@ -98,7 +98,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 }
             }
 
-            source.AppendLine("    public void OnBeforeSerialize()");
+            source.AppendLine("    public void OnAfterDeserialize()");
             source.AppendLine("    {");
 
             foreach (var field in fields)
@@ -110,7 +110,7 @@ internal class SerializeInterfaceAttribute : Attribute
 
             source.AppendLine("    }");
 
-            source.AppendLine("    public void OnAfterDeserialize()");
+            source.AppendLine("    public void OnBeforeSerialize()");
             source.AppendLine("    {");
             source.AppendLine("    }");
 
