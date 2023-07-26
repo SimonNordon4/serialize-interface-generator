@@ -151,10 +151,9 @@ internal class SerializeInterfaceAttribute : Attribute
             var namespaceName = namespaceDeclaration?.Name.ToString();
 
             var source = new StringBuilder();
-
-
-            
             source.AppendLine("using UnityEngine;");
+            // This namespace contains our ValidateInterface Attribute and Drawer.
+            source.AppendLine("using SerializeInterface;");
             
             // If the original class is a namespace, we want the generated class to be apart of the same namespace.
             if (!string.IsNullOrEmpty(namespaceName))
@@ -165,13 +164,41 @@ internal class SerializeInterfaceAttribute : Attribute
             
             source.AppendLine($"public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver");
             source.AppendLine("{");
-            source.AppendLine("    [SerializeField]private MonoBehaviour TestObject;");
+
+            // Generate the concrete backing fields for each interface.
+            foreach (var field in fields)
+            {
+                // Get the in script symbol for the field
+                var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
+                // Get the full name of the interface
+                var interfaceNamespace = symbol.Type.ContainingNamespace.ToDisplayString();
+                // If the interface is in a namespace, we need to include it in the full name
+                var interfaceFullName =
+                    !string.IsNullOrEmpty(interfaceNamespace) && interfaceNamespace != "<global namespace>"
+                        ? interfaceNamespace + "." + symbol.Type.Name
+                        : symbol.Type.Name;
+                
+                source.AppendLine(
+                    $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
+            }
+
             source.AppendLine("    public void OnBeforeSerialize()");
             source.AppendLine("    {");
+
+            // Generate the code to assign the backing fields to the interface fields on BeforeSerialize
+            foreach (var field in fields)
+            {
+                var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
+                source.AppendLine(
+                    $"        {field.Declaration.Variables.First().Identifier.Text} = {field.Declaration.Variables.First().Identifier.Text}_Object as {symbol.Type};");
+            }
             source.AppendLine("    }");
+            
+            // We have to implement this because Unity didn't follow SOLID.
             source.AppendLine("    public void OnAfterDeserialize()");
             source.AppendLine("    {");
             source.AppendLine("    }");
+            
             source.AppendLine("}");
 
             // If the original class was part of the namespace, we have to close off the scope.

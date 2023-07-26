@@ -1,10 +1,12 @@
 using UnityEngine;
+using SerializeInterface;
 namespace SerializeInterface.Samples{
 public partial class InterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-    [SerializeField]private MonoBehaviour TestObject;
+    [SerializeField, ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private Object _foo_Object;
     public void OnBeforeSerialize()
     {
+        _foo = _foo_Object as SerializeInterface.Samples.IFoo;
     }
     public void OnAfterDeserialize()
     {

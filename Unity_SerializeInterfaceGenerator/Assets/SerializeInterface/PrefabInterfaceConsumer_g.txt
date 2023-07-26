@@ -1,9 +1,11 @@
 using UnityEngine;
+using SerializeInterface;
 public partial class PrefabInterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-    [SerializeField]private MonoBehaviour TestObject;
+    [SerializeField, ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private Object _fooPrefab_Object;
     public void OnBeforeSerialize()
     {
+        _fooPrefab = _fooPrefab_Object as SerializeInterface.Samples.IFoo;
     }
     public void OnAfterDeserialize()
     {
