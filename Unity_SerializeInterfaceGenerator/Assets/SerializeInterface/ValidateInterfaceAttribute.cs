@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SerializeInterface.Planning
+namespace SerializeInterface
 {
     [AttributeUsage(AttributeTargets.Field, Inherited = true)]
     public class ValidateInterfaceAttribute : PropertyAttribute

@@ -7,46 +7,30 @@ using System.Text;
 using System.Linq;
 
 [Generator]
-public class SerializedInterfaceGenerator : ISourceGenerator
+internal sealed class SerializedInterfaceGenerator : ISourceGenerator
 {
-    private const string attributeText = @"
+    private const string AttributeText = @"
 using System;
-[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-public sealed class SerializeInterfaceAttribute : Attribute
-{
-    // This attribute doesn't need to contain any fields or properties
-}
-";
 
+[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+public sealed class SerializeInterface2Attribute : Attribute
+{
+}";
+    
     public void Initialize(GeneratorInitializationContext context)
     {
+        // context.RegisterForPostInitialization
+        //     (i => i.AddSource("SerializeInterfaceAttribute_g.cs", AttributeText));
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
     public void Execute(GeneratorExecutionContext context)
     {
-        // Check if the attribute is already defined
-        // var attributeSymbol = context.Compilation.GetTypeByMetadataName("SerializeInterfaceAttribute");
-        // if (attributeSymbol == null)
-        // {
-        //     // Add the attribute source code
-        //     context.AddSource("SerializeInterfaceAttribute", SourceText.From(attributeText, Encoding.UTF8));
-        // }
-
-        // Check if any of the syntax trees in the compilation contain a using directive for "UnityEngine"
-        bool isAssemblyCSharp = context.Compilation.SyntaxTrees.Any(tree =>
-            tree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>()
-                .Any(u => u.Name.ToString() == "UnityEngine"));
-
-        if (isAssemblyCSharp)
-        {
-            // Add the attribute source code
-            context.AddSource("SerializeInterfaceAttribute", SourceText.From(attributeText, Encoding.UTF8));
-        }
-
+        // Create a HashSet to store the names of the interfaces
+        HashSet<string> interfaces = new HashSet<string>();
+        
         if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
             return;
-
 
         foreach (var classDeclaration in receiver.Classes)
         {
@@ -70,6 +54,7 @@ public sealed class SerializeInterfaceAttribute : Attribute
             }
 
             source.AppendLine("using UnityEngine;");
+            source.AppendLine("using SerializeInterface;");
             source.AppendLine(
                 $"public partial class {classDeclaration.Identifier.Text} : MonoBehaviour, ISerializationCallbackReceiver");
             source.AppendLine("{");
@@ -78,13 +63,31 @@ public sealed class SerializeInterfaceAttribute : Attribute
             {
                 var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
                 var interfaceNamespace = symbol.Type.ContainingNamespace.ToDisplayString();
-                var interfaceFullName = !string.IsNullOrEmpty(interfaceNamespace)
+                var interfaceFullName = !string.IsNullOrEmpty(interfaceNamespace) && interfaceNamespace != "<global namespace>"
                     ? interfaceNamespace + "." + symbol.Type.Name
                     : symbol.Type.Name;
                 source.AppendLine(
                     $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
-            }
 
+                if (!interfaces.Contains(interfaceFullName))
+                {
+                    // Add the interface to the HashSet
+                    interfaces.Add(interfaceFullName);
+
+                    // Generate the method for the interface
+                    source.AppendLine(
+                        $"    public {interfaceFullName} InstantiateInterface({interfaceFullName} instance)");
+                    source.AppendLine("    {");
+                    source.AppendLine(
+                        $"        if (instance is MonoBehaviour {field.Declaration.Variables.First().Identifier.Text}_mono)");
+                    source.AppendLine(
+                        $"            return Object.Instantiate({field.Declaration.Variables.First().Identifier.Text}_mono) as {interfaceFullName};");
+                    source.AppendLine(
+                        $"        Debug.LogError($\"Attempted to instantiate interface {interfaceFullName}, but it is not a MonoBehaviour!\", this);");
+                    source.AppendLine("        return null;");
+                    source.AppendLine("    }");
+                }
+            }
 
             source.AppendLine("    public void OnBeforeSerialize()");
             source.AppendLine("    {");
@@ -108,23 +111,15 @@ public sealed class SerializeInterfaceAttribute : Attribute
             {
                 source.AppendLine("}");
             }
-
-            var diagnostic = Diagnostic.Create(
-                new DiagnosticDescriptor(
-                    id: "SG0001",
-                    title: "Generated source code",
-                    messageFormat: "Generated source code: {0}",
-                    category: "SourceGenerator",
-                    DiagnosticSeverity.Info,
-                    isEnabledByDefault: true),
-                Location.None,
-                source.ToString());
-            context.ReportDiagnostic(diagnostic);
+            
+            // output the source to a text file
+            const string path = @"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Generated\";
+            System.IO.File.WriteAllText($"{path}{classDeclaration.Identifier.Text}_g.txt", source.ToString());
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(source.ToString(), Encoding.UTF8));
         }
-    }
+    } 
 
     internal class SyntaxReceiver : ISyntaxReceiver
     {
