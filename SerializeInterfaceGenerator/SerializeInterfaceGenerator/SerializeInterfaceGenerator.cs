@@ -24,13 +24,11 @@ internal class SerializeInterfaceAttribute : Attribute
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
-
-
     public void Execute(GeneratorExecutionContext context)
     {
-        GenerateTest(context);
+        GenerateClasses(context);
     } 
-    private void GenerateTest(GeneratorExecutionContext context)
+    private static void GenerateClasses(GeneratorExecutionContext context)
     {
         if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
             return;
@@ -126,8 +124,6 @@ internal class SerializeInterfaceAttribute : Attribute
             {
                 source.AppendLine("}");
             }
-            
-            System.IO.File.WriteAllText($@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{classDeclaration.Identifier.Text}_g.txt", source.ToString());
             
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(source.ToString(), Encoding.UTF8));
