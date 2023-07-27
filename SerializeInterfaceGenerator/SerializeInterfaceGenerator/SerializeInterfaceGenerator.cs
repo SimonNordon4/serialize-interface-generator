@@ -83,12 +83,13 @@ internal class SerializeInterfaceAttribute : Attribute
                 interfaces.Add(interfaceFullName);
             }
 
-            source.AppendLine("    public void OnBeforeSerialize()");
+            source.AppendLine("    void ISerializationCallbackReceiver.OnBeforeSerialize()");
             source.AppendLine("    {");
+            //source.AppendLine("        OnBeforeSerialize();");
             source.AppendLine("    }");
             
             // We have to implement this because Unity didn't follow SOLID.
-            source.AppendLine("    public void OnAfterDeserialize()");
+            source.AppendLine("    void ISerializationCallbackReceiver.OnAfterDeserialize()");
             source.AppendLine("    {");
             // Generate the code to assign the backing fields to the interface fields on BeforeSerialize
             foreach (var field in fields)
