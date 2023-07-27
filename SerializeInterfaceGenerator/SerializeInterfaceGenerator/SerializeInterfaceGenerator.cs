@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -77,20 +78,45 @@ internal class SerializeInterfaceAttribute : Attribute
                         ? interfaceNamespace + "." + symbol.Type.Name
                         : symbol.Type.Name;
                 
+                // Gather all attributes on the original [SerializeInterface]
+                StringBuilder attributeStringBuilder = new StringBuilder();
+
+                // Loop through each attribute list in the field declaration
+                foreach (var attributeList in field.AttributeLists)
+                {
+                    // Loop through each attribute in the attribute list
+                    foreach (var attribute in attributeList.Attributes)
+                    {
+                        // If the attribute is not SerializeInterface, append it to the attribute string builder
+                        if (attribute.Name.ToString() != "SerializeInterface")
+                        {
+                            // Get the arguments and convert them to string with correct format
+                            var arguments = attribute.ArgumentList.Arguments
+                                .Select(arg => arg.ToString())
+                                .Aggregate((a, b) => a + ", " + b);
+
+                            // Append attribute to the string builder with arguments
+                            attributeStringBuilder.Append($"[{attribute.Name}({arguments})]");
+                        }
+                    }
+                }
+
+                
                 source.AppendLine(
-                    $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
+                    $"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))]{attributeStringBuilder.ToString()} private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
+                //source.AppendLine($"    [SerializeField, ValidateInterface(typeof({interfaceFullName}))] private Object {field.Declaration.Variables.First().Identifier.Text}_Object;");
                 
                 interfaces.Add(interfaceFullName);
             }
 
             source.AppendLine("    void ISerializationCallbackReceiver.OnBeforeSerialize()");
             source.AppendLine("    {");
-            //source.AppendLine("        OnBeforeSerialize();");
             source.AppendLine("    }");
             
             // We have to implement this because Unity didn't follow SOLID.
             source.AppendLine("    void ISerializationCallbackReceiver.OnAfterDeserialize()");
             source.AppendLine("    {");
+            
             // Generate the code to assign the backing fields to the interface fields on BeforeSerialize
             foreach (var field in fields)
             {
@@ -126,9 +152,18 @@ internal class SerializeInterfaceAttribute : Attribute
                 source.AppendLine("}");
             }
             
+            PrintOutputToPath(source, classDeclaration.Identifier.Text);
+            
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(source.ToString(), Encoding.UTF8));
         }
+
+
+    }
+    
+    private static void PrintOutputToPath(StringBuilder source, string classId)
+    {
+        System.IO.File.WriteAllText($@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{classId}_g.txt", source.ToString());
     }
 
     internal class SyntaxReceiver : ISyntaxReceiver

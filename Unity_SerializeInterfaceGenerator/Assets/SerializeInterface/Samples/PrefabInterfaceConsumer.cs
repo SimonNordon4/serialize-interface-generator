@@ -3,7 +3,7 @@ using UnityEngine;
 
     public partial class PrefabInterfaceConsumer : MonoBehaviour
     {
-        [SerializeInterface]
+        [SerializeInterface,Tooltip("This is a tooltip")]
         private IFoo _fooPrefab;
         [SerializeInterface]
         private IBar _barPrefab;
