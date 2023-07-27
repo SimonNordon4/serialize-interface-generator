@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using System.Linq;
+using System.Reflection;
 
 [Generator]
 public class SerializedInterfaceGenerator : ISourceGenerator
@@ -152,7 +154,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 source.AppendLine("}");
             }
             
-            PrintOutputToPath(source, classDeclaration.Identifier.Text);
+            // PrintOutputToPath(source, classDeclaration.Identifier.Text);
             
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(source.ToString(), Encoding.UTF8));
@@ -163,7 +165,13 @@ internal class SerializeInterfaceAttribute : Attribute
     
     private static void PrintOutputToPath(StringBuilder source, string classId)
     {
-        System.IO.File.WriteAllText($@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{classId}_g.txt", source.ToString());
+        var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+        var uri = new UriBuilder(codeBase);
+        var path = Uri.UnescapeDataString(uri.Path);
+        var assemblyDirectory = Path.GetDirectoryName(path);
+
+        var outputPath = Path.Combine(assemblyDirectory, $"Assets\\SerializeInterface\\{classId}_g.txt");
+        File.WriteAllText(outputPath, source.ToString());
     }
 
     internal class SyntaxReceiver : ISyntaxReceiver
