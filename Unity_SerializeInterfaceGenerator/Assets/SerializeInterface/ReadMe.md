@@ -1,3 +1,8 @@
+### Update 1
+
+- Classes using [SerializeInterface] can now implement ISerializationCallbackReciever.
+- Other attributes used along side [SerializeInterface] should now appear in the inspector (like [Tooltip()] for example)
+
 # Serialize Interface
 
 ___
