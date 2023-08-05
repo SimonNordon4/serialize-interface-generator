@@ -75,6 +75,9 @@ internal class SerializeInterfaceAttribute : Attribute
                 // Is this a readonly field?
                 var isReadOnly = symbol?.IsReadOnly ?? false;
                 
+                // Skip static fields.
+                if (symbol?.IsStatic ?? false) continue;  
+                
                 // Check if the field is a list of interfaces
                 var namedType = symbol?.Type as INamedTypeSymbol;
                 var isList = namedType != null &&
@@ -91,7 +94,7 @@ internal class SerializeInterfaceAttribute : Attribute
 
                 // If it's a readonly list with no initializer, skip it.
                 var hasInitializer = field.Declaration.Variables.Any(v => v.Initializer != null);
-                if (!hasInitializer) continue;
+                if (isReadOnly && !hasInitializer) continue;
                 
 
                 // If the field is a list, we want to get the type of the interface, not the list.
@@ -244,7 +247,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 classSource.AppendLine("}");
             }
 
-            PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
+            //PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(classSource.ToString(), Encoding.UTF8));
