@@ -220,6 +220,7 @@ internal class SerializeInterfaceAttribute : Attribute
         var assemblyDirectory = Path.GetDirectoryName(path);
 
         var outputPath = Path.Combine(assemblyDirectory, $"Assets\\SerializeInterface\\{classId}_g.txt");
+        outputPath = @"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets";
         File.WriteAllText(outputPath, source.ToString());
     }
 
