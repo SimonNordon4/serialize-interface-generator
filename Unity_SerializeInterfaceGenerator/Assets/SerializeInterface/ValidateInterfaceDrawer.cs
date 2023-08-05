@@ -28,19 +28,22 @@ namespace SerializeInterface
                 }
                 else if (newValue is GameObject gameObject)
                 {
+                    // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
                     var component = gameObject.GetComponent(interfaceAttribute.RequiredType);
+                    // ReSharper disable once Unity.PerformanceCriticalCodeNullComparison
                     if (component != null)
                     {
                         property.objectReferenceValue = component;
                     }
                     else
                     {
+                        // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
                         Debug.LogWarning(
                             $"The assigned GameObject does not contain a component that implements the required interface {interfaceAttribute.RequiredType.Name}");
                     }
                 }
                 else if ((newValue is MonoBehaviour || newValue is ScriptableObject) &&
-                         interfaceAttribute.RequiredType.IsAssignableFrom(newValue.GetType()))
+                         interfaceAttribute.RequiredType.IsInstanceOfType(newValue))
                 {
                     property.objectReferenceValue = newValue;
                 }

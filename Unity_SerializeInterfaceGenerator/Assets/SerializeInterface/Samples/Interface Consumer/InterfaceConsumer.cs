@@ -5,7 +5,7 @@ namespace SerializeInterface.Samples
 {
     public partial class InterfaceConsumer : MonoBehaviour
     {
-        [SerializeInterface] private IFoo _foo;
+        [SerializeInterface][Tooltip("Hello")] private IFoo _foo;
         [SerializeInterface] private IBar _bar;
         
         private void Start()

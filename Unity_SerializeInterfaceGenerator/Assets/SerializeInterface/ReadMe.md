@@ -1,6 +1,13 @@
-### Update 1
+### Update 2 
+(05/08/2023)
 
-- Classes using [SerializeInterface] can now implement ISerializationCallbackReciever.
+- Added support for Lists
+- No longer attempts to serialize readonly fields.
+
+### Update 1 
+(28/07/2023)
+
+- Classes using [SerializeInterface] can now implement ISerializationCallbackReceiver.
 - Other attributes used along side [SerializeInterface] should now appear in the inspector (like [Tooltip()] for example)
 
 # Serialize Interface
