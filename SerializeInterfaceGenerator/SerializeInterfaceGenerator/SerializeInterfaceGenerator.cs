@@ -123,7 +123,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 var backingFieldName = $"{fieldDeclaration}{suffix}";
                 
                 backingFieldsSource.AppendLine(
-                    $"        [SerializeField,ValidateInterface(typeof({interfaceFullName}))] private {backingFieldType} {backingFieldName};");
+                    $"        [SerializeField,ValidateInterface(typeof({interfaceFullName}))]{attributeBuilder} private {backingFieldType} {backingFieldName};");
 
                 // Now create the Deserialize method.
                 if (!isList)

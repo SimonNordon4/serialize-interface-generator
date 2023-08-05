@@ -4,7 +4,7 @@ namespace SerializeInterface.Samples
 {
 public partial class InterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private UnityEngine.Object _fooSerializedObject;
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))][Tooltip("Hello")] private UnityEngine.Object _fooSerializedObject;
         [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private UnityEngine.Object _barSerializedObject;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {

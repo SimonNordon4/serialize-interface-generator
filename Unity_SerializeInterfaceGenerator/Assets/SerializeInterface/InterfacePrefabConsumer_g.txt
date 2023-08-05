@@ -2,7 +2,7 @@ using UnityEngine;
 using SerializeInterface;
 public partial class InterfacePrefabConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private UnityEngine.Object _fooPrefabSerializedObject;
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))][Tooltip("This is a tooltip")] private UnityEngine.Object _fooPrefabSerializedObject;
         [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private UnityEngine.Object _barPrefabSerializedObject;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
