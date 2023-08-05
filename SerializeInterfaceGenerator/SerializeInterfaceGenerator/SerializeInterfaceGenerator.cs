@@ -59,8 +59,6 @@ internal class SerializeInterfaceAttribute : Attribute
             var backingFieldsSource = new StringBuilder();
             // Code that goes into the OnAfterDeserialization Block.
             var deserializationSource = new StringBuilder();
-            // Readonly Lists require method calls to be deserialized.
-            var deserializeReadonlyListMethodsSource = new StringBuilder();
             // Add InstantiateInterface methods.
             var instantiateMethodSource = new StringBuilder();
 
@@ -85,8 +83,16 @@ internal class SerializeInterfaceAttribute : Attribute
                              namedType.TypeArguments.Length == 1 &&
                              namedType.TypeArguments[0].TypeKind == TypeKind.Interface;
                 
-                // We do not serialize readonly fields as they cannot be set.
-                if(isReadOnly && !isList) continue;
+                // Lets us know if we need to include System.Collections.Generic in the using statements.
+                if (isList) doAnyListsExist = true;
+
+                // If it's a readonly class, skip it.;
+                if (isReadOnly && !isList) continue;
+
+                // If it's a readonly list with no initializer, skip it.
+                var hasInitializer = field.Declaration.Variables.Any(v => v.Initializer != null);
+                if (!hasInitializer) continue;
+                
 
                 // If the field is a list, we want to get the type of the interface, not the list.
                 var interfaceSymbol = isList
@@ -140,41 +146,29 @@ internal class SerializeInterfaceAttribute : Attribute
                 backingFieldsSource.AppendLine(
                     $"    [SerializeField,ValidateInterface(typeof({interfaceFullName}))] private {backingFieldType} {backingFieldName};");
 
-                // Now create the Deserialize method.
-                if (!isList && !isReadOnly)
+                // If it's a field we just have to assign it.
+                if (!isList)
                 {
                     deserializationSource.AppendLine($"    {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
                 }
+                // If its a list we just have to check it for null, and assign each object in the backing list.
                 else if(isList && !isReadOnly)
                 {
                     deserializationSource.AppendLine($"    if ({fieldDeclaration} == null)");
-                    deserializationSource.AppendLine("    {");
                     deserializationSource.AppendLine($"        {fieldDeclaration} = new List<{interfaceFullName}>();");
-                    deserializationSource.AppendLine("    }");
                     deserializationSource.AppendLine($"    else {fieldDeclaration}.Clear();");
                     deserializationSource.AppendLine($"    foreach (var obj in {backingFieldName})");
                     deserializationSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
                 }
+                // If its a readonly list, we assume it's not null and just assign each object in the backing list.
                 else if (isList && isReadOnly)
                 {
-                    deserializationSource.AppendLine($"    SerializeReadOnlyList{interfaceSymbol?.Name}();");
-                    deserializeReadonlyListMethodsSource.AppendLine($"    private void SerializeReadOnlyList{interfaceSymbol?.Name}()");
-                    deserializeReadonlyListMethodsSource.AppendLine("    {");
-                    deserializeReadonlyListMethodsSource.AppendLine($"        if({fieldDeclaration} == null)");
-                    deserializeReadonlyListMethodsSource.AppendLine("        {");
-                    deserializeReadonlyListMethodsSource.AppendLine(
-                        $@"        Debug.LogError(""[SerializeInterface] Cannot serialize the readonly list {fieldDeclaration} as it is null." + 
-                        @" Please set it to a value in its declaration."",this);");
-                    deserializeReadonlyListMethodsSource.AppendLine("        return;");
-                    deserializeReadonlyListMethodsSource.AppendLine("        }");
-                    deserializeReadonlyListMethodsSource.AppendLine($"    {fieldDeclaration}.Clear();");
-                    deserializeReadonlyListMethodsSource.AppendLine($"    foreach (var obj in {backingFieldName})");
-                    deserializeReadonlyListMethodsSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
-                    deserializeReadonlyListMethodsSource.AppendLine("    }");
-                    
+                    deserializationSource.AppendLine($"    {fieldDeclaration}.Clear();");
+                    deserializationSource.AppendLine($"    foreach (var obj in {backingFieldName})");
+                    deserializationSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
                 }
                 
-                if (isList) doAnyListsExist = true;
+
 
                 interfaces.Add(interfaceFullName);
             }
@@ -238,9 +232,6 @@ internal class SerializeInterfaceAttribute : Attribute
             classSource.Append(deserializationSource);
 
             classSource.AppendLine("    }");
-
-            // Add all the methods for deserialize read only lists.
-            classSource.Append(deserializeReadonlyListMethodsSource);
             
             // Add all the instantiate methods to the bottom of the class.
             classSource.Append(instantiateMethodSource);

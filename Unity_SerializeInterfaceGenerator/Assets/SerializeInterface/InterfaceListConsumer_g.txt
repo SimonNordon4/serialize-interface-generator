@@ -13,25 +13,14 @@ public partial class InterfaceListConsumer : MonoBehaviour, ISerializationCallba
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-    SerializeReadOnlyListIFoo();
-    if (_barList == null)
-    {
-        _barList = new List<SerializeInterface.Samples.IBar>();
-    }
-    else _barList.Clear();
-    foreach (var obj in _barListSerialized)
-        _barList.Add(obj as SerializeInterface.Samples.IBar);
-    }
-    private void SerializeReadOnlyListIFoo()
-    {
-        if(_fooList == null)
-        {
-        Debug.LogError("[SerializeInterface] Cannot serialize the readonly list _fooList as it is null. Please set it to a value in its declaration.",this);
-        return;
-        }
     _fooList.Clear();
     foreach (var obj in _fooListSerialized)
         _fooList.Add(obj as SerializeInterface.Samples.IFoo);
+    if (_barList == null)
+        _barList = new List<SerializeInterface.Samples.IBar>();
+    else _barList.Clear();
+    foreach (var obj in _barListSerialized)
+        _barList.Add(obj as SerializeInterface.Samples.IBar);
     }
     private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
     {

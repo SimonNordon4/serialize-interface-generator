@@ -4,40 +4,11 @@ namespace SerializeInterface.Samples
 {
 public partial class InterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-    [UnityEngine.TooltipAttribute("Hello")]
-    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private UnityEngine.Object _fooSerializedObject;
-    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private UnityEngine.Object _barSerializedObject;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-    _foo = _fooSerializedObject as SerializeInterface.Samples.IFoo;
-    _bar = _barSerializedObject as SerializeInterface.Samples.IBar;
-    }
-    private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
-    {
-        if (instance is MonoBehaviour monoInterface)
-            return Object.Instantiate(monoInterface) as SerializeInterface.Samples.IFoo;
-        if (instance == null)
-        {
-            Debug.LogError("Attempted to instantiate interface with null instance!", this);
-            return null;
-        }
-        Debug.LogError($"Attempted to instantiate interface SerializeInterface.Samples.IFoo, but it is not a MonoBehaviour!", this);
-        return null;
-    }
-    private SerializeInterface.Samples.IBar InstantiateInterface(SerializeInterface.Samples.IBar instance)
-    {
-        if (instance is MonoBehaviour monoInterface)
-            return Object.Instantiate(monoInterface) as SerializeInterface.Samples.IBar;
-        if (instance == null)
-        {
-            Debug.LogError("Attempted to instantiate interface with null instance!", this);
-            return null;
-        }
-        Debug.LogError($"Attempted to instantiate interface SerializeInterface.Samples.IBar, but it is not a MonoBehaviour!", this);
-        return null;
     }
 }
 }
