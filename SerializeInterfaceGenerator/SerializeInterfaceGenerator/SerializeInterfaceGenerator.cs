@@ -55,9 +55,13 @@ internal class SerializeInterfaceAttribute : Attribute
                 .FirstOrDefault();
             var namespaceName = namespaceDeclaration?.Name.ToString();
 
-
+            // All the backing fields
             var backingFieldsSource = new StringBuilder();
+            // Code that goes into the OnAfterDeserialization Block.
             var deserializationSource = new StringBuilder();
+            // Readonly Lists require method calls to be deserialized.
+            var deserializeReadonlyListMethodsSource = new StringBuilder();
+            // Add InstantiateInterface methods.
             var instantiateMethodSource = new StringBuilder();
 
             // The main class source builder
@@ -137,31 +141,37 @@ internal class SerializeInterfaceAttribute : Attribute
                     $"    [SerializeField,ValidateInterface(typeof({interfaceFullName}))] private {backingFieldType} {backingFieldName};");
 
                 // Now create the Deserialize method.
-                if (!isList)
+                if (!isList && !isReadOnly)
                 {
-                    deserializationSource.AppendLine(
-                        $"    {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
+                    deserializationSource.AppendLine($"    {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
                 }
-                else
+                else if(isList && !isReadOnly)
                 {
                     deserializationSource.AppendLine($"    if ({fieldDeclaration} == null)");
                     deserializationSource.AppendLine("    {");
-
-                    if (isReadOnly)
-                    {
-                        deserializationSource.AppendLine(
-                            $@"        Debug.LogWarning(""[SerializeInterface] Cannot serialize the readonly list {fieldDeclaration} as it is null." + 
-                            @" Please set it to a value in its declaration."",this);");
-                        deserializationSource.AppendLine("    }");
-                    }
-                    else
-                    {
-                        deserializationSource.AppendLine($"        {fieldDeclaration} = new List<{interfaceFullName}>();");
-                        deserializationSource.AppendLine("    }");
-                        deserializationSource.AppendLine($"    else {fieldDeclaration}.Clear();");
-                        deserializationSource.AppendLine($"    foreach (var obj in {backingFieldName})");
-                        deserializationSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
-                    }
+                    deserializationSource.AppendLine($"        {fieldDeclaration} = new List<{interfaceFullName}>();");
+                    deserializationSource.AppendLine("    }");
+                    deserializationSource.AppendLine($"    else {fieldDeclaration}.Clear();");
+                    deserializationSource.AppendLine($"    foreach (var obj in {backingFieldName})");
+                    deserializationSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
+                }
+                else if (isList && isReadOnly)
+                {
+                    deserializationSource.AppendLine($"    SerializeReadOnlyList{interfaceSymbol?.Name}();");
+                    deserializeReadonlyListMethodsSource.AppendLine($"    private void SerializeReadOnlyList{interfaceSymbol?.Name}()");
+                    deserializeReadonlyListMethodsSource.AppendLine("    {");
+                    deserializeReadonlyListMethodsSource.AppendLine($"        if({fieldDeclaration} == null)");
+                    deserializeReadonlyListMethodsSource.AppendLine("        {");
+                    deserializeReadonlyListMethodsSource.AppendLine(
+                        $@"        Debug.LogError(""[SerializeInterface] Cannot serialize the readonly list {fieldDeclaration} as it is null." + 
+                        @" Please set it to a value in its declaration."",this);");
+                    deserializeReadonlyListMethodsSource.AppendLine("        return;");
+                    deserializeReadonlyListMethodsSource.AppendLine("        }");
+                    deserializeReadonlyListMethodsSource.AppendLine($"    {fieldDeclaration}.Clear();");
+                    deserializeReadonlyListMethodsSource.AppendLine($"    foreach (var obj in {backingFieldName})");
+                    deserializeReadonlyListMethodsSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
+                    deserializeReadonlyListMethodsSource.AppendLine("    }");
+                    
                 }
                 
                 if (isList) doAnyListsExist = true;
@@ -190,8 +200,9 @@ internal class SerializeInterfaceAttribute : Attribute
                 instantiateMethodSource.AppendLine("    }");
             }
 
-            classSource.AppendLine("using UnityEngine;");
+            // Begin creating the class.
             
+            classSource.AppendLine("using UnityEngine;");
             // This namespace contains ValidateInterfaceAttribute, which is used to validate the interfaces.
             classSource.AppendLine("using SerializeInterface;");
             
@@ -228,6 +239,9 @@ internal class SerializeInterfaceAttribute : Attribute
 
             classSource.AppendLine("    }");
 
+            // Add all the methods for deserialize read only lists.
+            classSource.Append(deserializeReadonlyListMethodsSource);
+            
             // Add all the instantiate methods to the bottom of the class.
             classSource.Append(instantiateMethodSource);
 
@@ -239,7 +253,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 classSource.AppendLine("}");
             }
 
-            //PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
+            PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(classSource.ToString(), Encoding.UTF8));

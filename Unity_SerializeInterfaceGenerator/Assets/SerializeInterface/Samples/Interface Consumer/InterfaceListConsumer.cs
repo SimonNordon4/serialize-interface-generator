@@ -5,7 +5,7 @@ namespace SerializeInterface.Samples
 {
     public partial class InterfaceListConsumer : MonoBehaviour
     {
-        [SerializeInterface] private readonly List<IFoo> _fooList = new();
+        [SerializeInterface] private readonly List<IFoo> _fooList;
         [SerializeInterface][Tooltip("This is a list of IBar interfaces")] private List<IBar> _barList = new();
         private void Start()
         {

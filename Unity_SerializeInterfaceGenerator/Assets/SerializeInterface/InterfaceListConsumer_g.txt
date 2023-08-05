@@ -6,18 +6,14 @@ namespace SerializeInterface.Samples
 public partial class InterfaceListConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
     [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private List<UnityEngine.Object> _fooListSerialized;
-    [JetBrains.Annotations.UsedImplicitlyAttribute]
-    [UnityEngine.TooltipAttribute("hi")]
+    [UnityEngine.TooltipAttribute("This is a list of IBar interfaces")]
     [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private List<UnityEngine.Object> _barListSerialized;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-    if (_fooList == null)
-    {
-        Debug.LogWarning("[SerializeInterface] Cannot serialize the readonly list _fooList as it is null. Please set it to a value in its declaration.",this);
-    }
+    SerializeReadOnlyListIFoo();
     if (_barList == null)
     {
         _barList = new List<SerializeInterface.Samples.IBar>();
@@ -25,6 +21,17 @@ public partial class InterfaceListConsumer : MonoBehaviour, ISerializationCallba
     else _barList.Clear();
     foreach (var obj in _barListSerialized)
         _barList.Add(obj as SerializeInterface.Samples.IBar);
+    }
+    private void SerializeReadOnlyListIFoo()
+    {
+        if(_fooList == null)
+        {
+        Debug.LogError("[SerializeInterface] Cannot serialize the readonly list _fooList as it is null. Please set it to a value in its declaration.",this);
+        return;
+        }
+    _fooList.Clear();
+    foreach (var obj in _fooListSerialized)
+        _fooList.Add(obj as SerializeInterface.Samples.IFoo);
     }
     private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
     {
