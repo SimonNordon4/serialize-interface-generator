@@ -162,6 +162,69 @@ internal class SerializeInterfaceAttribute : Attribute
 
 
     }
+
+    /// <summary>
+    /// Generate a partial class when detecting a [SerializeInterface]
+    /// </summary>
+    private static void GenerateClass()
+    {
+        
+    }
+
+    /// <summary>
+    /// Generate a back object to match an Interface.
+    /// </summary>
+    /// <returns></returns>
+    private static string GenerateBackingObject()
+    {
+        return null;
+    }
+    
+    /// <summary>
+    /// Generate a backing Object List to match an Interface List.
+    /// </summary>
+    /// <returns>Generate a backing field of a List of Objects.</returns>
+    private static string GenerateBackingObjectList()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Collect all attributes from the original interface field to be appended to the new backing field.
+    /// </summary>
+    /// <returns>A string of attributes including their arguments.</returns>
+    private static string GenerateInheritedAttributes()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Generate method for Deserializing the backing Object.
+    /// </summary>
+    /// <returns></returns>
+    private static string GenerateObjectDeserialization()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Generate method for Deserializing the backing Object List.
+    /// </summary>
+    /// <returns></returns>
+    private static string GenerateListDeserialization()
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// Generate a method for instantiating an interface that is assumed to be a mono behaviour.
+    /// </summary>
+    /// <returns></returns>
+    private static string GenerateInterfaceInstantiateMethod()
+    {
+        return null;
+    }
+    
     
     private static void PrintOutputToPath(StringBuilder source, string classId)
     {
