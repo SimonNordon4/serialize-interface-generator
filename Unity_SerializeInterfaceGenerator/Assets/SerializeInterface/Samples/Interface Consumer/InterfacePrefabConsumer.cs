@@ -1,9 +1,9 @@
 ﻿using SerializeInterface.Samples;
 using UnityEngine;
 
-    public partial class PrefabInterfaceConsumer : MonoBehaviour
+    public partial class InterfacePrefabConsumer : MonoBehaviour
     {
-        [SerializeInterface,Tooltip("This is a tooltip")]
+        [SerializeInterface][Tooltip("This is a tooltip")]
         private IFoo _fooPrefab;
         [SerializeInterface]
         private IBar _barPrefab;
