@@ -6,8 +6,7 @@ namespace SerializeInterface.Samples
 {
     public partial class InterfaceListConsumer : MonoBehaviour
     {
-        private readonly List<IFoo> _fooList = new();
-        private readonly List<IBar> _barList = new();
+        private List<IFoo> _fooList;
 
         private void Start()
         {
@@ -31,29 +30,12 @@ namespace SerializeInterface.Samples
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            Debug.Log("Deserializing");
-            
-            _fooList?.Clear(); // Clear list before repopulating
-            _barList?.Clear(); // Clear list before repopulating
+            if(_fooList == null) _fooList = new List<IFoo>();
+            else _fooList.Clear();
             
             foreach (var foo in fooListSerialized)
-            {
-                // Cast and check for nullity before adding
-                if (foo is IFoo deserializedFoo)
-                {
-                    _fooList.Add(deserializedFoo);
-                }
-            }
-
-            foreach (var bar in barListSerialized)
-            {
-                // Cast and check for nullity before adding
-                IBar deserializedBar = bar as IBar;
-                if (deserializedBar != null)
-                {
-                    _barList.Add(deserializedBar);
-                }
-            }
+                _fooList.Add(foo as IFoo);
+   
         }
     }
 }
