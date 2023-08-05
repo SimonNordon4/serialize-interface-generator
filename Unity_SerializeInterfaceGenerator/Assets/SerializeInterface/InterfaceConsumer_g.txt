@@ -4,15 +4,16 @@ namespace SerializeInterface.Samples
 {
 public partial class InterfaceConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))][Tooltip("Hello")] private UnityEngine.Object _fooSerializedObject;
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private UnityEngine.Object _barSerializedObject;
+    [UnityEngine.TooltipAttribute("Hello")]
+    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private UnityEngine.Object _fooSerializedObject;
+    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private UnityEngine.Object _barSerializedObject;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-        _foo = _fooSerializedObject as SerializeInterface.Samples.IFoo;
-        _bar = _barSerializedObject as SerializeInterface.Samples.IBar;
+    _foo = _fooSerializedObject as SerializeInterface.Samples.IFoo;
+    _bar = _barSerializedObject as SerializeInterface.Samples.IBar;
     }
     private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
     {

@@ -70,9 +70,9 @@ internal class SerializeInterfaceAttribute : Attribute
                 // Get the in script symbol for the field
                 var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
                 
-                // We don't want to attempt to serialize readonly fields.
-                if(symbol?.IsReadOnly ?? false) continue;
-
+                // Is this a readonly field?
+                var isReadOnly = symbol?.IsReadOnly ?? false;
+                
                 // Check if the field is a list of interfaces
                 var namedType = symbol?.Type as INamedTypeSymbol;
                 var isList = namedType != null &&
@@ -80,11 +80,17 @@ internal class SerializeInterfaceAttribute : Attribute
                              namedType.Name == "List" &&
                              namedType.TypeArguments.Length == 1 &&
                              namedType.TypeArguments[0].TypeKind == TypeKind.Interface;
+                
+                // We do not serialize readonly fields as they cannot be set.
+                if(isReadOnly && !isList) continue;
 
                 // If the field is a list, we want to get the type of the interface, not the list.
                 var interfaceSymbol = isList
                     ? namedType.TypeArguments[0]
                     : symbol?.Type;
+                
+                // If the field is not an interface, or a list of interfaces, we skip it.
+                if (interfaceSymbol?.TypeKind != TypeKind.Interface) continue;
 
                 // Get the full name of the interface, including namespaces if any.
                 var interfaceNamespace = interfaceSymbol?.ContainingNamespace.ToDisplayString();
@@ -101,16 +107,20 @@ internal class SerializeInterfaceAttribute : Attribute
                     {
                         // If the attribute is not SerializeInterface, append it to the attribute string builder
                         if (attribute.Name.ToString() == "SerializeInterface") continue;
+                        
+                        var attributeTypeSymbol = model.GetTypeInfo(attribute).Type;
 
                         // Get the arguments and convert them to string with correct format
                         var arguments = attribute.ArgumentList?.Arguments
                             .Select(arg => arg.ToString())
                             .Aggregate((a, b) => a + ", " + b);
+                        
+                        var attributeName = attributeTypeSymbol?.ToDisplayString() ?? attribute.Name.ToString();
 
-                        attributeBuilder.Append(
+                        attributeBuilder.AppendLine(
                             arguments == null
-                                ? $"[{attribute.Name}]"
-                                : $"[{attribute.Name}({arguments})]");
+                                ? $"    [{attributeName}]"
+                                : $"    [{attributeName}({arguments})]");
                     }
                 }
 
@@ -122,23 +132,36 @@ internal class SerializeInterfaceAttribute : Attribute
                 
                 var backingFieldName = $"{fieldDeclaration}{suffix}";
                 
+                backingFieldsSource.Append(attributeBuilder);
                 backingFieldsSource.AppendLine(
-                    $"        [SerializeField,ValidateInterface(typeof({interfaceFullName}))]{attributeBuilder} private {backingFieldType} {backingFieldName};");
+                    $"    [SerializeField,ValidateInterface(typeof({interfaceFullName}))] private {backingFieldType} {backingFieldName};");
 
                 // Now create the Deserialize method.
                 if (!isList)
                 {
                     deserializationSource.AppendLine(
-                        $"        {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
+                        $"    {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
                 }
                 else
                 {
-                    deserializationSource.AppendLine(
-                        $"            if ({fieldDeclaration} == null) {fieldDeclaration} = new List<{interfaceFullName}>();");
-                    deserializationSource.AppendLine($"            else {fieldDeclaration}.Clear();");
-                    deserializationSource.AppendLine($"            foreach (var obj in {backingFieldName})");
-                    deserializationSource.AppendLine(
-                        $"                {fieldDeclaration}.Add(obj as {interfaceFullName});");
+                    deserializationSource.AppendLine($"    if ({fieldDeclaration} == null)");
+                    deserializationSource.AppendLine("    {");
+
+                    if (isReadOnly)
+                    {
+                        deserializationSource.AppendLine(
+                            $@"        Debug.LogWarning(""[SerializeInterface] Cannot serialize the readonly list {fieldDeclaration} as it is null." + 
+                            @" Please set it to a value in its declaration."",this);");
+                        deserializationSource.AppendLine("    }");
+                    }
+                    else
+                    {
+                        deserializationSource.AppendLine($"        {fieldDeclaration} = new List<{interfaceFullName}>();");
+                        deserializationSource.AppendLine("    }");
+                        deserializationSource.AppendLine($"    else {fieldDeclaration}.Clear();");
+                        deserializationSource.AppendLine($"    foreach (var obj in {backingFieldName})");
+                        deserializationSource.AppendLine($"        {fieldDeclaration}.Add(obj as {interfaceFullName});");
+                    }
                 }
                 
                 if (isList) doAnyListsExist = true;
@@ -216,7 +239,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 classSource.AppendLine("}");
             }
 
-            PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
+            //PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(classSource.ToString(), Encoding.UTF8));

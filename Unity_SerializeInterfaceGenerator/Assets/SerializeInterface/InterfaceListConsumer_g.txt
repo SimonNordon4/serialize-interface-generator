@@ -5,21 +5,26 @@ namespace SerializeInterface.Samples
 {
 public partial class InterfaceListConsumer : MonoBehaviour, ISerializationCallbackReceiver
 {
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private List<UnityEngine.Object> _fooListSerialized;
-        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private List<UnityEngine.Object> _barListSerialized;
+    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IFoo))] private List<UnityEngine.Object> _fooListSerialized;
+    [JetBrains.Annotations.UsedImplicitlyAttribute]
+    [UnityEngine.TooltipAttribute("hi")]
+    [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IBar))] private List<UnityEngine.Object> _barListSerialized;
     void ISerializationCallbackReceiver.OnBeforeSerialize()
     {
     }
     void ISerializationCallbackReceiver.OnAfterDeserialize()
     {
-            if (_fooList == null) _fooList = new List<SerializeInterface.Samples.IFoo>();
-            else _fooList.Clear();
-            foreach (var obj in _fooListSerialized)
-                _fooList.Add(obj as SerializeInterface.Samples.IFoo);
-            if (_barList == null) _barList = new List<SerializeInterface.Samples.IBar>();
-            else _barList.Clear();
-            foreach (var obj in _barListSerialized)
-                _barList.Add(obj as SerializeInterface.Samples.IBar);
+    if (_fooList == null)
+    {
+        Debug.LogWarning("[SerializeInterface] Cannot serialize the readonly list _fooList as it is null. Please set it to a value in its declaration.",this);
+    }
+    if (_barList == null)
+    {
+        _barList = new List<SerializeInterface.Samples.IBar>();
+    }
+    else _barList.Clear();
+    foreach (var obj in _barListSerialized)
+        _barList.Add(obj as SerializeInterface.Samples.IBar);
     }
     private SerializeInterface.Samples.IFoo InstantiateInterface(SerializeInterface.Samples.IFoo instance)
     {

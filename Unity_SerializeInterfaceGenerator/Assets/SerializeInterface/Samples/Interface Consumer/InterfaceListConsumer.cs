@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SerializeInterface.Samples
 {
     public partial class InterfaceListConsumer : MonoBehaviour
     {
-        [SerializeInterface] private List<IFoo> _fooList = new();
-        [SerializeInterface] private List<IBar> _barList = new();
-        [SerializeField]private List<Object> objectList = new();
+        [SerializeInterface] private readonly List<IFoo> _fooList = new();
+        [SerializeInterface][Tooltip("This is a list of IBar interfaces")] private List<IBar> _barList = new();
         private void Start()
         {
             foreach (var foo in _fooList)

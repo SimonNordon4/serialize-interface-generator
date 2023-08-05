@@ -2,7 +2,10 @@
 (05/08/2023)
 
 - Added support for Lists
-- No longer attempts to serialize readonly fields.
+- Readonly Lists will be serialized as long as they are not null.
+- No longer attempts to serialize readonly interface fields.
+- Fixed an issue where Attributes that weren't in the global namespace would not be found.
+- Fixed an issue where the attribute would attempt to Serialize non interface fields.
 
 ### Update 1 
 (28/07/2023)
