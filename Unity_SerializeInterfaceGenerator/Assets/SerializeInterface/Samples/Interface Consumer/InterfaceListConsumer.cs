@@ -5,10 +5,8 @@ namespace SerializeInterface.Samples
 {
     public partial class InterfaceListConsumer : MonoBehaviour
     {
-        //[SerializeInterface] 
-        private readonly List<IFoo> _fooList = new();
-        //[SerializeInterface] 
-        private List<IBar> _barList;
+        [SerializeInterface] private readonly List<IFoo> _fooList = new();
+        [SerializeInterface] private List<IBar> _barList;
         private void Start()
         {
             foreach (var foo in _fooList)
