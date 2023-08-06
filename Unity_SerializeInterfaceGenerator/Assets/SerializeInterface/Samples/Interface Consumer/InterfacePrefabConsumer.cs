@@ -9,10 +9,10 @@ using UnityEngine;
         private IBar _barPrefab;
         private void Start()        
         {
-            var foo = InstantiateInterface(_fooPrefab);
-            var bar = InstantiateInterface(_barPrefab);
-            
-            foo.PrintFooValue();
-            bar.PrintBarMessage();
+            // var foo = InstantiateInterface(_fooPrefab);
+            // var bar = InstantiateInterface(_barPrefab);
+            //
+            // foo.PrintFooValue();
+            // bar.PrintBarMessage();
         }
     }

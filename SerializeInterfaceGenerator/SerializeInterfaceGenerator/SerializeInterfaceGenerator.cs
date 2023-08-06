@@ -247,7 +247,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 classSource.AppendLine("}");
             }
 
-            //PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
+            PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(classSource.ToString(), Encoding.UTF8));
