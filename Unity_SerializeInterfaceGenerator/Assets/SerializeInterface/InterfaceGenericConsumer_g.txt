@@ -1,0 +1,37 @@
+using UnityEngine;
+using SerializeInterface;
+using System.Collections.Generic;
+namespace SerializeInterface.Samples
+{
+    public partial class InterfaceGenericConsumer : MonoBehaviour, ISerializationCallbackReceiver
+    {
+
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IGeneric<System.Int32>))]
+        private UnityEngine.Object _intGenericSerialized;
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IGeneric<System.String>))]
+        private UnityEngine.Object _stringGenericSerialized;
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IGeneric<System.Int32>))]
+        private List<UnityEngine.Object> _listGenericSerialized;
+        [SerializeField,ValidateInterface(typeof(SerializeInterface.Samples.IGeneric<SerializeInterface.Samples.IGeneric<System.Int32>>))]
+        private UnityEngine.Object _nestedGenericSerialized;
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+
+        _intGeneric = _intGenericSerialized as SerializeInterface.Samples.IGeneric<System.Int32>;
+        _stringGeneric = _stringGenericSerialized as SerializeInterface.Samples.IGeneric<System.String>;
+        if (_listGeneric == null)
+            _listGeneric = new List<SerializeInterface.Samples.IGeneric<System.Int32>>();
+        _listGeneric.Clear();
+        foreach (var obj in _listGenericSerialized)
+            _listGeneric.Add(obj as SerializeInterface.Samples.IGeneric<System.Int32>);
+        _nestedGeneric = _nestedGenericSerialized as SerializeInterface.Samples.IGeneric<SerializeInterface.Samples.IGeneric<System.Int32>>;
+
+        }
+
+    }
+}

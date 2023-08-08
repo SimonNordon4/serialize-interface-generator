@@ -42,11 +42,11 @@
           "dependencies": {
             "Microsoft.CodeAnalysis.CSharp": {
               "target": "Package",
-              "version": "[4.1.0, )"
+              "version": "[3.8.0, )"
             },
             "Microsoft.CodeAnalysis.Common": {
               "target": "Package",
-              "version": "[4.1.0, )"
+              "version": "[3.9.0, )"
             },
             "NETStandard.Library": {
               "suppressParent": "All",
