@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
@@ -11,37 +13,113 @@ namespace SerializeInterfaceGenerator
     {
         private readonly GeneratorExecutionContext _context;
         private readonly SemanticModel _semanticModel;
+        private readonly ClassDeclarationSyntax _classDeclaration;
         private readonly FieldDeclarationSyntax[] _fieldDeclarations;
         private readonly string _classNameSpace;
         private readonly string _className;
 
+        private readonly INamedTypeSymbol _classSymbol;
+        private readonly bool _isGeneric;
+
         private readonly bool _printOutput;
         
-        public ClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration, bool printOutput = false)
+        public ClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration, SemanticModel model, FieldDeclarationSyntax[] fields, bool printOutput = false)
         {
             _context = context;
-            _semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-            
-            
-            _fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                .Where(f => f.AttributeLists.Any(
-                    a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")))
-                .ToArray();
-            
+            _semanticModel = model;
+            _fieldDeclarations = fields;
+            _classDeclaration = classDeclaration;
+            _classSymbol = _semanticModel.GetDeclaredSymbol(_classDeclaration);
+            _isGeneric = _classSymbol?.IsGenericType ?? false;
+
             _classNameSpace = classDeclaration
                 .AncestorsAndSelf()
                 .OfType<NamespaceDeclarationSyntax>()
                 .FirstOrDefault()
                 ?.Name.ToString();
-            
+
             _className = classDeclaration.Identifier.Text;
-            
+
             _printOutput = printOutput;
+            
         }
 
+        private static bool IsDerivedFrom(INamedTypeSymbol typeSymbol, INamedTypeSymbol baseTypeSymbol)
+        {
+            while (typeSymbol != null)
+            {
+                if (typeSymbol.Equals(baseTypeSymbol))
+                {
+                    return true;
+                }
+
+                typeSymbol = typeSymbol.BaseType;
+            }
+
+            return false;
+        }
+        
+        private static List<INamedTypeSymbol> GetAllDerivedClasses(INamedTypeSymbol baseType, Compilation compilation)
+        {
+            var derivedClasses = new List<INamedTypeSymbol>();
+
+            // Iterate over all trees in the compilation
+            foreach (var tree in compilation.SyntaxTrees)
+            {
+                var semanticModel = compilation.GetSemanticModel(tree);
+        
+                // Iterate over all class declarations in the tree
+                foreach (var classDeclaration in tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>())
+                {
+                    var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+                    if (classSymbol != null && IsDerivedFrom(classSymbol, baseType))
+                    {
+                        derivedClasses.Add(classSymbol);
+                    }
+                }
+            }
+
+            return derivedClasses;
+        }
+        
         public void GenerateClass()
         {
             if (!_fieldDeclarations.Any()) return;
+
+            if (_isGeneric)
+            {
+                var derivedTypes = new List<INamedTypeSymbol>();
+                
+                var _compilation = _semanticModel.Compilation;
+                var targetType = _semanticModel.GetTypeInfo(_classDeclaration).Type;
+                
+                foreach (var syntaxTree in _compilation.SyntaxTrees)
+                {
+                    var semanticModel = _compilation.GetSemanticModel(syntaxTree);
+                    var classDeclarations = syntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
+                    
+                    PrintOutput(classDeclarations.Count().ToString(), _className + " Class Declarations");
+
+                    foreach (var classDeclaration in classDeclarations)
+                    {
+                        var classSymbol = semanticModel.GetDeclaredSymbol(_classDeclaration) as INamedTypeSymbol;
+                        var currentSymbol = classSymbol.BaseType;
+
+                        while (currentSymbol != null)
+                        {
+                            if (currentSymbol.Equals(targetType))
+                            {
+                                derivedTypes.Add(classSymbol);
+                                break;
+                            }
+
+                            currentSymbol = currentSymbol.BaseType;
+                        }
+                    }
+                }
+            }
+
+            
             
             var classSource = new StringBuilder();
             var backingFieldSource = new StringBuilder();
@@ -112,7 +190,7 @@ namespace SerializeInterfaceGenerator
                 classSource.AppendLine("}");
             }
 
-            if(_printOutput) PrintOutput(classSource.ToString());
+            if(_printOutput) PrintOutput(classSource.ToString(), _className);
             
             _context.AddSource($"{_className}_g.cs", SourceText.From(classSource.ToString(), Encoding.UTF8));
         }
@@ -134,9 +212,9 @@ namespace SerializeInterfaceGenerator
             return false;
         }
 
-        private void PrintOutput(string source)
+        private void PrintOutput(string source, string fileName)
         {
-            var outputPath = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{_className}_g.txt";
+            var outputPath = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{fileName}_g.txt";
            System.IO.File.WriteAllText(outputPath, source);
         }
         

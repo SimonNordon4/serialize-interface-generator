@@ -36,7 +36,17 @@ internal class SerializeInterfaceAttribute : Attribute
 
         foreach (var classDeclaration in receiver.Classes)
         {
-            var classGenerator = new ClassGenerator(context, classDeclaration,true);
+            // check if the class container the attribute [SerializeInterface] anywhere
+            var model = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+            var fields = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
+                .Where(f => f.AttributeLists.Any(
+                    a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")))
+                .ToArray();
+            
+            // If no [SerializeInterface] attribute is found, skip this class.
+            if (!fields.Any()) return;
+            
+            var classGenerator = new ClassGenerator(context, classDeclaration, model, fields);
             classGenerator.GenerateClass();
         }
     }
