@@ -38,8 +38,6 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         {
             var classValidator = new ClassValidator(context, classDeclaration);
             classValidator.ValidateClass();
-            // var classGenerator = new ClassGenerator(context, classDeclaration);
-            // classGenerator.GenerateClass();
         }
     }
     
