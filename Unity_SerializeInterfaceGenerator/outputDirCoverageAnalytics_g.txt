@@ -1,0 +1,1 @@
+CoverageAnalytics is derived from generic: True

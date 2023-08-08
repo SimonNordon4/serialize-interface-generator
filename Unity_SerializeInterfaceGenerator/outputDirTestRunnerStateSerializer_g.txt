@@ -1,0 +1,1 @@
+TestRunnerStateSerializer is derived from generic: False

@@ -1,0 +1,1 @@
+CoverageEventDataImplementation is derived from generic: False

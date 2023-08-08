@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -14,30 +15,32 @@ namespace SerializeInterfaceGenerator
         private readonly FieldDeclarationSyntax[] _fieldDeclarations;
         private readonly string _classNameSpace;
         private readonly string _className;
-
         private readonly bool _printOutput;
-        
-        public ClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration, bool printOutput = false)
+
+        public ClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration,
+            bool printOutput = false)
         {
             _context = context;
             _semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-            
-            
+
             _fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
                 .Where(f => f.AttributeLists.Any(
                     a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")))
                 .ToArray();
-            
+
             _classNameSpace = classDeclaration
                 .AncestorsAndSelf()
                 .OfType<NamespaceDeclarationSyntax>()
                 .FirstOrDefault()
                 ?.Name.ToString();
-            
+
             _className = classDeclaration.Identifier.Text;
-            
+
             _printOutput = printOutput;
+
+            
         }
+
 
         public void GenerateClass()
         {
@@ -115,6 +118,37 @@ namespace SerializeInterfaceGenerator
             if(_printOutput) PrintOutput(classSource.ToString());
             
             _context.AddSource($"{_className}_g.cs", SourceText.From(classSource.ToString(), Encoding.UTF8));
+        }
+
+        private void GenerateClassWithGenericParent()
+        {
+            // // check if the parent of the class is a generic class
+            // // if it is, we need to add the generic type to the class name
+            // var parentClassDeclaration = _classDeclaration
+            //     .AncestorsAndSelf()
+            //     .OfType<ClassDeclarationSyntax>()
+            //     .Skip(1)
+            //     .FirstOrDefault();
+            //
+            // if (parentClassDeclaration?.TypeParameterList?.Parameters.Count > 0)
+            // {
+            //     var parentGenericType = parentClassDeclaration.TypeParameterList.Parameters.First();
+            //     
+            //     // Get all parent fields that are marked with the SerializeInterface attribute, generic and use the same argument as the parent.
+            //     _parentFieldDeclarations = parentClassDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
+            //         .Where(f => f.AttributeLists.Any(
+            //                         a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface"))
+            //                     && f.Declaration.Type is GenericNameSyntax genericType
+            //                     && genericType.TypeArgumentList.Arguments.Any(arg => arg.ToString() == parentGenericType.Identifier.Text)) // Compare with parent's generic type
+            //         .ToArray();
+            //     
+            //     _parentIsGenericWithGenericFields = _parentFieldDeclarations.Any();
+            // }
+            // else
+            // {
+            //     _parentFieldDeclarations = Array.Empty<FieldDeclarationSyntax>();
+            //     _parentIsGenericWithGenericFields = false;
+            //}
         }
 
         private bool DoesClassContainList()

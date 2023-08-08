@@ -1,0 +1,1 @@
+Child is derived from generic: True

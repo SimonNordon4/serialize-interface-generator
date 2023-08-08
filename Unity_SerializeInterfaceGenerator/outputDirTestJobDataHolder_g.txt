@@ -1,0 +1,1 @@
+TestJobDataHolder is derived from generic: True

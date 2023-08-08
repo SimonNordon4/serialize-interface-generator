@@ -1,0 +1,1 @@
+CoverageRunData is derived from generic: True

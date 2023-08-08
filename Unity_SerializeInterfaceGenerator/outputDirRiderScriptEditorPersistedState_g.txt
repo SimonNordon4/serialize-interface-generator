@@ -1,0 +1,1 @@
+RiderScriptEditorPersistedState is derived from generic: True

@@ -1,0 +1,1 @@
+ProfileAnalyzerWindow is derived from generic: False
