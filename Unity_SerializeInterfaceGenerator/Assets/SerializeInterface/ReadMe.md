@@ -1,3 +1,13 @@
+### Update 3
+(07/08/2023)
+
+New:
+ - Added support for Generic Interfaces.
+ - Added support for Derived Interfaces.
+
+Breaking Changes:
+ - Removed InstantiateInterface() helper function. 
+
 ### Update 2 
 (05/08/2023)
 

@@ -8,6 +8,8 @@ using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using System.Linq;
 using System.Reflection;
+using System.Security;
+using SerializeInterfaceGenerator;
 
 [Generator]
 public class SerializedInterfaceGenerator : ISourceGenerator
@@ -29,8 +31,16 @@ internal class SerializeInterfaceAttribute : Attribute
 
     public void Execute(GeneratorExecutionContext context)
     {
-        GenerateClasses(context);
+        if (!(context.SyntaxReceiver is SyntaxReceiver receiver))
+            return;
+
+        foreach (var classDeclaration in receiver.Classes)
+        {
+            var classGenerator = new ClassGenerator(context, classDeclaration,true);
+            classGenerator.GenerateClass();
+        }
     }
+
 
     private static void GenerateClasses(GeneratorExecutionContext context)
     {
@@ -69,7 +79,7 @@ internal class SerializeInterfaceAttribute : Attribute
 
             foreach (var field in fields)
             {
-                // Get the in script symbol for the field
+                // Get the in script fieldSymbol for the field
                 var symbol = model.GetDeclaredSymbol(field.Declaration.Variables.First()) as IFieldSymbol;
                 
                 // Is this a readonly field?
@@ -85,6 +95,8 @@ internal class SerializeInterfaceAttribute : Attribute
                              namedType.Name == "List" &&
                              namedType.TypeArguments.Length == 1 &&
                              namedType.TypeArguments[0].TypeKind == TypeKind.Interface;
+
+
                 
                 // Lets us know if we need to include System.Collections.Generic in the using statements.
                 if (isList) doAnyListsExist = true;
@@ -111,6 +123,15 @@ internal class SerializeInterfaceAttribute : Attribute
                     !string.IsNullOrEmpty(interfaceNamespace) && interfaceNamespace != "<global namespace>"
                         ? interfaceNamespace + "." + interfaceSymbol.Name
                         : interfaceSymbol?.Name;
+
+                
+                var isGeneric = namedType.IsGenericType;
+                var genericType = isGeneric ? namedType.TypeArguments[0] : null;
+                var genericTypeNamespace = genericType?.ContainingNamespace.ToDisplayString();
+                var genericName = $"{genericTypeNamespace}.{genericType?.Name}";
+
+                // Lists are always generic!
+                if(isGeneric && genericType != null && !isList) interfaceFullName = $"{interfaceFullName}<{genericName}>";
 
                 var attributeBuilder = new StringBuilder();
                 // Now get all attributes associated with the field, so that we can copy them to the backing field.
@@ -150,7 +171,7 @@ internal class SerializeInterfaceAttribute : Attribute
                     $"    [SerializeField,ValidateInterface(typeof({interfaceFullName}))] private {backingFieldType} {backingFieldName};");
 
                 // If it's a field we just have to assign it.
-                if (!isList)
+                if (!isList && !isGeneric)
                 {
                     deserializationSource.AppendLine($"    {fieldDeclaration} = {backingFieldName} as {interfaceFullName};");
                 }
@@ -237,7 +258,7 @@ internal class SerializeInterfaceAttribute : Attribute
             classSource.AppendLine("    }");
             
             // Add all the instantiate methods to the bottom of the class.
-            classSource.Append(instantiateMethodSource);
+            // classSource.Append(instantiateMethodSource);
 
             classSource.AppendLine("}");
 
@@ -247,7 +268,7 @@ internal class SerializeInterfaceAttribute : Attribute
                 classSource.AppendLine("}");
             }
 
-            // PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
+            //PrintOutputToPath(classSource, classDeclaration.Identifier.Text);
 
             context.AddSource($"{classDeclaration.Identifier.Text}_g.cs",
                 SourceText.From(classSource.ToString(), Encoding.UTF8));
@@ -256,12 +277,6 @@ internal class SerializeInterfaceAttribute : Attribute
 
     private static void PrintOutputToPath(StringBuilder source, string fileId)
     {
-        // var codeBase = Assembly.GetExecutingAssembly().CodeBase;
-        // var uri = new UriBuilder(codeBase);
-        // var path = Uri.UnescapeDataString(uri.Path);
-        // var assemblyDirectory = Path.GetDirectoryName(path);
-
-        //var outputPath = Path.Combine(assemblyDirectory, $"Assets\\SerializeInterface\\{fileId}_g.txt");
         var outputPath =
             $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{fileId}_g.txt";
         File.WriteAllText(outputPath, source.ToString());
