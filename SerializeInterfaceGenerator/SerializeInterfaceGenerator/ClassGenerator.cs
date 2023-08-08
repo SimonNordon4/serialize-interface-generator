@@ -17,35 +17,23 @@ namespace SerializeInterfaceGenerator
         private readonly string _className;
         private readonly bool _printOutput;
 
-        public ClassGenerator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration,
-            bool printOutput = false)
+        public ClassGenerator(ClassValidator validator, bool printOutput = false)
         {
-            _context = context;
-            _semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
-
-            _fieldDeclarations = classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                .Where(f => f.AttributeLists.Any(
-                    a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")))
-                .ToArray();
-
-            _classNameSpace = classDeclaration
+            _context = validator.Context;
+            _semanticModel = validator.Context.Compilation.GetSemanticModel(validator.ClassDeclaration.SyntaxTree);
+            _fieldDeclarations = validator.FieldDeclarations;
+            _classNameSpace = validator.ClassDeclaration
                 .AncestorsAndSelf()
                 .OfType<NamespaceDeclarationSyntax>()
                 .FirstOrDefault()
                 ?.Name.ToString();
-
-            _className = classDeclaration.Identifier.Text;
-
+            _className = validator.ClassDeclaration.Identifier.Text;
             _printOutput = printOutput;
-
-            
         }
 
 
         public void GenerateClass()
         {
-            if (!_fieldDeclarations.Any()) return;
-            
             var classSource = new StringBuilder();
             var backingFieldSource = new StringBuilder();
             var afterDeserializeSource = new StringBuilder();
