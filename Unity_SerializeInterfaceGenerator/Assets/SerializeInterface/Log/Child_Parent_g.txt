@@ -1,0 +1,1 @@
+Is derived from generic? TrueBase Arguments Int32Base type Symbol ParentNumber of fields in the parent class 1

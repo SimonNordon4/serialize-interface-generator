@@ -1,7 +1,7 @@
 ﻿namespace SerializeInterface.Samples.GenericInheritance
 {
-    public partial class Child : Parent<int>
+    public class Child : Parent<int>
     {
-        
+        [SerializeInterface] private IFoo m_TestFoo;
     }
 }

@@ -21,6 +21,8 @@ namespace SerializeInterfaceGenerator
             
             // Our class may inherit from a generic class, so we need to get the generic type arguments
             
+  
+            
             
             var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
             var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol;
@@ -28,8 +30,23 @@ namespace SerializeInterfaceGenerator
  
             var isDerivedFromGeneric = baseTypeSymbol != null && baseTypeSymbol.IsGenericType;
             
-            SerializedInterfaceGenerator.PrintOutputToPath(
-                $"{classDeclaration.Identifier.Text} is derived from generic: {isDerivedFromGeneric}", classDeclaration.Identifier.Text);
+            var baseTypeArgument = baseTypeSymbol?.TypeArguments.First().Name;
+            
+            // Get all fields with SerializeInterface in the parent class
+            var parentFields = baseTypeSymbol?.GetMembers().Where(m => m.Kind == SymbolKind.Field)
+                .Where(f => f.GetAttributes().Any(a => a.AttributeClass?.Name == "SerializeInterfaceAttribute"));
+
+            if (classDeclaration.Identifier.Text == "Child")
+            {
+                SerializedInterfaceGenerator.PrintOutputToPath("Child Found", "ChildFound");
+                SerializedInterfaceGenerator
+                    .PrintOutputToPath($"Is derived from generic? {isDerivedFromGeneric}\n" +
+                    $"Base Arguments {baseTypeArgument}\n" +
+                    $"Base type Symbol {baseTypeSymbol?.Name}\n" +
+                    $"Number of fields in the parent class {parentFields?.Count()}\n",
+                        "Child_Parent");
+            }
+
         }
 
         public void ValidateClass()
