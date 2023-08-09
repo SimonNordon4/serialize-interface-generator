@@ -1,0 +1,3 @@
+Is parent generic? Trueparent class: SerializeInterface.GenericParent.Parent<bool>
+ parent fields: 1
+ 

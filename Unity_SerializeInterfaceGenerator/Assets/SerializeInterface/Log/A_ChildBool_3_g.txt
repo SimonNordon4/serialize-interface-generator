@@ -1,0 +1,6 @@
+field type? IGeneric<T>
+ field type args IGeneric<T>
+ genericNameSyntax IGeneric<T>
+ Type Arguments T
+ Type Argument Type generic type parameter
+ 
