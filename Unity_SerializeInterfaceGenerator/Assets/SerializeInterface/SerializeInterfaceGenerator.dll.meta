@@ -2,7 +2,6 @@ fileFormatVersion: 2
 guid: 88dec3a25b1ded1449d0f292c29a18e9
 labels:
 - RoslynAnalyzer
-- RunOnlyOnAssembliesWithReference
 - SourceGenerator
 PluginImporter:
   externalObjects: {}

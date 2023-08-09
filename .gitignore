@@ -72,3 +72,4 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 Unity_SerializeInterfaceGenerator/Library/*
+Unity_SerializeInterfaceGenerator/Assets/Plugins/UniRx/*
