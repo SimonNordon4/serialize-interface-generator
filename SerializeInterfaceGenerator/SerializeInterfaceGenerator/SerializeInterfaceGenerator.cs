@@ -37,7 +37,7 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         foreach (var classDeclaration in receiver.Classes)
         {
             var classValidator = new ClassValidator(context, classDeclaration);
-            classValidator.ValidateClassOrReactiveSystem();
+            //classValidator.ValidateClassOrReactiveSystem();
         }
     }
     
@@ -45,8 +45,13 @@ public class SerializedInterfaceGenerator : ISourceGenerator
 
     public static void PrintOutputToPath(string source, string fileId)
     {
-        var outputPath =
-            $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\{fileId}_g.txt";
+        var outputDir =
+            $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\";
+
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+        
+        var outputPath = $"{outputDir}{fileId}_g.txt";
         File.WriteAllText(outputPath, source.ToString());
     }
 

@@ -9,6 +9,8 @@ namespace SerializeInterfaceGenerator
         public readonly GeneratorExecutionContext Context;
         public readonly ClassDeclarationSyntax ClassDeclaration;
         public readonly FieldDeclarationSyntax[] FieldDeclarations;
+        public readonly bool IsParentClassGeneric;
+        public readonly INamedTypeSymbol ParentNamedTypeSymbol;
    
 
         public ClassValidator(GeneratorExecutionContext context, ClassDeclarationSyntax classDeclaration)
@@ -19,6 +21,28 @@ namespace SerializeInterfaceGenerator
                 .Where(f => f.AttributeLists.Any(
                     a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface")))
                 .ToArray();
+            
+            
+            var semanticModel = context.Compilation.GetSemanticModel(classDeclaration.SyntaxTree);
+            var baseType = classDeclaration.BaseList?.Types.FirstOrDefault();
+            if (baseType != null)
+            {
+                var baseTypeInfo = semanticModel.GetTypeInfo(baseType.Type);
+                ParentNamedTypeSymbol = baseTypeInfo.Type as INamedTypeSymbol;
+                IsParentClassGeneric = ParentNamedTypeSymbol != null && ParentNamedTypeSymbol.IsGenericType;
+            }
+            else
+            {
+                IsParentClassGeneric = false;
+                ParentNamedTypeSymbol = null;
+            }
+
+            if (classDeclaration.Identifier.Text.Contains("A_Child"))
+            {
+                SerializedInterfaceGenerator.PrintOutputToPath($"Is parent generic? {IsParentClassGeneric}" +
+                                                               $"parent class: {ParentNamedTypeSymbol}"
+                                                               ,classDeclaration.Identifier.Text);
+            }
         }
 
         public void ValidateClass()

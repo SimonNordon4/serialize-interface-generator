@@ -167,6 +167,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84ff87ade4904d23876663a0578fa310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fooListSerialized: []
+  _barListSerialized: []
 --- !u!1 &204321786
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +274,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   property:
     value: 0
+  _handlersSerialized: []
 --- !u!1 &272753517
 GameObject:
   m_ObjectHideFlags: 0
@@ -381,6 +384,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28327ed1693d4bbaa7544bc9dbae0c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fooSerialized: {fileID: 0}
+  _barSerialized: {fileID: 0}
 --- !u!1 &743997300
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +587,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28327ed1693d4bbaa7544bc9dbae0c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fooSerialized: {fileID: 0}
+  _barSerialized: {fileID: 0}
 --- !u!4 &1049860351
 Transform:
   m_ObjectHideFlags: 0
@@ -896,6 +903,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f153073af8c140bb9501ea31435c3ddc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _intGenericSerialized: {fileID: 0}
+  _stringGenericSerialized: {fileID: 0}
+  _listGenericSerialized: []
+  _nestedGenericSerialized: {fileID: 0}
 --- !u!4 &1644890712
 Transform:
   m_ObjectHideFlags: 0
@@ -1023,6 +1034,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb9faea27a924ca484cbb48884795729, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _fooPrefabSerialized: {fileID: 0}
+  _barPrefabSerialized: {fileID: 0}
 --- !u!114 &3580684189695731947
 MonoBehaviour:
   m_ObjectHideFlags: 0

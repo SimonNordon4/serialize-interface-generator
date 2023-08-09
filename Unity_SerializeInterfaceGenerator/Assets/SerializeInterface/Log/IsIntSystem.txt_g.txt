@@ -1,3 +1,0 @@
-BaseType: ReactiveSystem<int> 
- IsBaseTypeReactiveSystem: True 
- Generic Value: int

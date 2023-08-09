@@ -12,7 +12,8 @@ namespace SerializeInterfaceGenerator
     {
         private readonly GeneratorExecutionContext _context;
         private readonly SemanticModel _semanticModel;
-        private readonly FieldDeclarationSyntax[] _fieldDeclarations;
+        private readonly FieldDeclarationSyntax[] _validFieldDeclarations;
+        private readonly IFieldSymbol[] _genericParentFields;
         private readonly string _classNameSpace;
         private readonly string _className;
         private readonly bool _printOutput;
@@ -21,15 +22,30 @@ namespace SerializeInterfaceGenerator
         {
             _context = validator.Context;
             _semanticModel = validator.Context.Compilation.GetSemanticModel(validator.ClassDeclaration.SyntaxTree);
-            _fieldDeclarations = validator.FieldDeclarations;
+            _validFieldDeclarations = validator.FieldDeclarations;
             _classNameSpace = validator.ClassDeclaration
                 .AncestorsAndSelf()
                 .OfType<NamespaceDeclarationSyntax>()
                 .FirstOrDefault()
                 ?.Name.ToString();
             _className = validator.ClassDeclaration.Identifier.Text;
+
+            if (validator.IsParentClassGeneric)
+            {
+                _genericParentFields = validator.ParentNamedTypeSymbol?.GetMembers()
+                    .OfType<IFieldSymbol>()
+                    .Where(member => member.GetAttributes().Any(at => at.AttributeClass.Name == "SerializeInterface") &&
+                                     member.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
+                    .ToArray() ?? Array.Empty<IFieldSymbol>();
+            }
+
+            _genericParentFields = Array.Empty<IFieldSymbol>();
+
             _printOutput = printOutput;
         }
+
+
+
 
 
         public void GenerateClass()
@@ -40,7 +56,7 @@ namespace SerializeInterfaceGenerator
             
             var indent = !string.IsNullOrEmpty(_classNameSpace) ? "    " : "";
             
-            foreach (var field in _fieldDeclarations)
+            foreach (var field in _validFieldDeclarations)
             {
                 var fieldGenerator = new BackingFieldGenerator(_semanticModel,field);
                backingFieldSource.Append(fieldGenerator.GenerateBackingField(indent));
@@ -141,7 +157,7 @@ namespace SerializeInterfaceGenerator
 
         private bool DoesClassContainList()
         {
-            foreach (var field in _fieldDeclarations)
+            foreach (var field in _validFieldDeclarations)
             {
                 // check if field is a list
                 if (field.Declaration.Type is GenericNameSyntax genericNameSyntax)
