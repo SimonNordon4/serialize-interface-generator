@@ -1,0 +1,25 @@
+using UnityEngine;
+using SerializeInterface;
+using System.Collections.Generic;
+public partial class IntSystem : ISerializationCallbackReceiver
+{
+
+[SerializeField,ValidateInterface(typeof(IHandler<int>))]
+private List<UnityEngine.Object> _handlersSerialized = new();
+
+    void ISerializationCallbackReceiver.OnBeforeSerialize()
+    {
+    }
+
+    void ISerializationCallbackReceiver.OnAfterDeserialize()
+    {
+
+        foreach (var obj in _handlersSerialized)
+        {
+            _handlers.Add(obj as IHandler<int>);
+        }
+
+
+    }
+
+}

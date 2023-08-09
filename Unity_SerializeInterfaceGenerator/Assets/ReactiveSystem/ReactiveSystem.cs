@@ -5,8 +5,7 @@ using UniRx;
 public class ReactiveSystem<T> : MonoBehaviour
 {
     [SerializeField] protected ReactiveProperty<T> property = new();
-
-    [SerializeInterface] private readonly List<IHandler<T>> _handlers = new List<IHandler<T>>();
+    protected readonly List<IHandler<T>> _handlers = new List<IHandler<T>>();
 
     public void Awake()
     {

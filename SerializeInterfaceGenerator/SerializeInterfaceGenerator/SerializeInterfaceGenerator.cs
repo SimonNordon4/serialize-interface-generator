@@ -37,7 +37,7 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         foreach (var classDeclaration in receiver.Classes)
         {
             var classValidator = new ClassValidator(context, classDeclaration);
-            classValidator.ValidateClass();
+            classValidator.ValidateClassOrReactiveSystem();
         }
     }
     
@@ -57,12 +57,8 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         public void OnVisitSyntaxNode(SyntaxNode node)
         {
             // Identify classes that contain fields marked with the [SerializeInterface] attribute
-            if (node is ClassDeclarationSyntax classDeclaration &&
-                classDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-                    .Any(f => f.AttributeLists.Count > 0))
-            {
+            if (node is ClassDeclarationSyntax classDeclaration)
                 Classes.Add(classDeclaration);
-            }
         }
     }
 }
