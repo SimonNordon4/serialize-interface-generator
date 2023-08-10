@@ -48,9 +48,6 @@ namespace SerializeInterfaceGenerator
                 }
                 
             }*/
-            
-            //Everything below wrapped in a single arg lol.
-            //var isUndefinedGenericField = (classDeclaration.BaseList?.Types.FirstOrDefault() as INamedTypeSymbol).DeclaringSyntaxReferences.FirstOrDefault().GetSyntax().DescendantNodes().OfType<FieldDeclarationSyntax>().ToArray().Where(f => f.AttributeLists.Any(a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface"))).First().Declaration.Type.DescendantNodesAndSelf().OfType<GenericNameSyntax>().FirstOrDefault().TypeArgumentList.Arguments.ToArray().OfType<IdentifierNameSyntax>().Where(identifierType => identifierType.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.TypeParameterList?.Parameters.Any(p => p.Identifier.Text == identifierType.Identifier.Text) == true || identifierType.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault()?.TypeParameterList?.Parameters.Any(p => p.Identifier.Text == identifierType.Identifier.Text) == true).Any();
 
             
             var baseType = classDeclaration.BaseList?.Types.FirstOrDefault();
@@ -99,20 +96,24 @@ namespace SerializeInterfaceGenerator
                     
                     var typeArguments = genericNameSyntax?.TypeArgumentList.Arguments;
 
+                    bool isUndefinedGenericField = false;
                     var args = "";
                     foreach (var typeArgument in typeArguments)
                     {
                         if (typeArgument is IdentifierNameSyntax identifierType)
                         {
                             // If it's an IdentifierNameSyntax and represents a generic type parameter, it will be part of the TypeParameterList
-                            var containingType = identifierType.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault();
-                            var containingMethod = identifierType.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+                            var containingType = identifierType.Ancestors().OfType<TypeDeclarationSyntax>()
+                                .FirstOrDefault();
+                            var containingMethod = identifierType.Ancestors().OfType<MethodDeclarationSyntax>()
+                                .FirstOrDefault();
 
-                            if (containingType?.TypeParameterList?.Parameters.Any(p => p.Identifier.Text == identifierType.Identifier.Text) == true
-                                || containingMethod?.TypeParameterList?.Parameters.Any(p => p.Identifier.Text == identifierType.Identifier.Text) == true)
+                            if (containingType?.TypeParameterList?.Parameters.Any(p =>
+                                    p.Identifier.Text == identifierType.Identifier.Text) == true
+                                || containingMethod?.TypeParameterList?.Parameters.Any(p =>
+                                    p.Identifier.Text == identifierType.Identifier.Text) == true)
                             {
-                                // The identifier represents a generic type parameter (e.g., <T>)
-                                // Handle this case
+                                isUndefinedGenericField = true;
                                 args += "generic type parameter";
                             }
                             else
@@ -123,14 +124,27 @@ namespace SerializeInterfaceGenerator
                             }
                         }
                     }
+
+                    // We have detected that a field is a generic identifier, so we want to get the name of the field.
+                    string fieldName = "";
+                    if(isUndefinedGenericField)
+                        fieldName = singleField.Declaration.Variables.First().Identifier.Text;
+                        
+                    var genericIdentifier = genericNameSyntax?.Identifier.Text;
                     
-                    
+                    var originalGenericValue = ParentNamedTypeSymbol?.TypeArguments.FirstOrDefault()?.Name;
+                    var originalGenericValueNamespace = ParentNamedTypeSymbol?.TypeArguments.FirstOrDefault()?.ContainingNamespace;
+
                     SerializedInterfaceGenerator
                         .PrintOutputToPath($"field type? {singleField.Declaration.Type}\n " +
-                                           $"field type args {singleField.Declaration.Type}\n " +
                                            $"genericNameSyntax {genericNameSyntax}\n " +
                                            $"Type Arguments {typeArguments}\n " +
-                                           $"Type Argument Type {args}\n " 
+                                           $"Type Argument Type {args}\n " +
+                                           $"Field Name: {fieldName}\n " +
+                                           $"Try get the name of the generic: {genericIdentifier}\n " +
+                                           $"Original Value: {originalGenericValue}\n " +
+                                           $"Name Space: {originalGenericValueNamespace}\n " +
+                                           $"The final field: private List<{genericIdentifier}<{originalGenericValueNamespace}.{originalGenericValue}>> {fieldName}"
                             ,classDeclaration.Identifier.Text + "_3");
 
             }

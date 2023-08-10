@@ -1,6 +1,9 @@
 field type? IGeneric<T>
- field type args IGeneric<T>
  genericNameSyntax IGeneric<T>
  Type Arguments T
  Type Argument Type generic type parameter
- 
+ Field Name: m_Value
+ Try get the name of the generic: IGeneric
+ Original Value: Boolean
+ Name Space: System
+ The final field: private List<IGeneric<System.Boolean>> m_Value
