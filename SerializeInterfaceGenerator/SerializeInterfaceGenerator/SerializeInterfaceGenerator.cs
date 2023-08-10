@@ -27,7 +27,7 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         foreach (var classDeclaration in receiver.Classes)
         {
             var classValidator = new ClassValidator(context, classDeclaration);
-            classValidator.ValidateClassOrReactiveSystem();
+            classValidator.ValidateClass();
         }
     }
 

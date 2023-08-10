@@ -1,6 +1,6 @@
 ﻿namespace SerializeInterface.GenericParent
 {
-    public class A_ChildInt : Parent<int>
+    public partial class A_ChildInt : Parent<int>
     {
         public int x;
         

@@ -17,6 +17,8 @@ namespace SerializeInterfaceGenerator
         private readonly string _className;
         private readonly bool _printOutput;
 
+        private readonly List<UndefinedGenericParentInfo> _undefinedGenericParentInfos;
+
         public ClassGenerator(ClassValidator validator, bool printOutput = false)
         {
             _context = validator.Context;
@@ -29,6 +31,8 @@ namespace SerializeInterfaceGenerator
                 ?.Name.ToString();
             _className = validator.ClassDeclaration.Identifier.Text;
             _printOutput = printOutput;
+            
+            _undefinedGenericParentInfos = validator.UndefinedGenericParentFieldInfo;
         }
 
         public void GenerateClass()
@@ -42,12 +46,20 @@ namespace SerializeInterfaceGenerator
             foreach (var field in _validFieldDeclarations)
             {
                 // We don't want to serialize <T> fields. That will be done in the children.
-                if(IsFieldIdentifierGeneric(field))
+                if(IsFieldrGenericUndefined(field))
                     continue;
                 
                 var fieldGenerator = new BackingFieldGenerator(_semanticModel,field);
                backingFieldSource.Append(fieldGenerator.GenerateBackingField(indent));
                afterDeserializeSource.Append(fieldGenerator.GenerateOnAfterDeserialization(indent));
+            }
+
+            // Serialize fields that are generic undefined in the parent.
+            foreach (var info in _undefinedGenericParentInfos)
+            {
+                // [SerializeField,ValidateInterface(typeof(IGeneric<bool>))] private List<IGeneric<UnityEngine.Object>> m_Value;
+                //backingFieldSource.AppendLine($"[SerializeField,ValidateInterface(typeof({info.GenericFullName}))] private UnityEngine.Object {info.FieldName}Serialized;");
+
             }
 
             classSource.AppendLine("using UnityEngine;");
@@ -114,7 +126,7 @@ namespace SerializeInterfaceGenerator
         /// <summary>
         /// Determines whether or not a field is an Undefined Generic with Identifier. (i.e. IGeneric T)
         /// </summary>
-        private static bool IsFieldIdentifierGeneric(FieldDeclarationSyntax field)
+        private static bool IsFieldrGenericUndefined(FieldDeclarationSyntax field)
         {
             var fieldType = field.Declaration.Type;
             var genericNameSyntax = fieldType.DescendantNodesAndSelf().OfType<GenericNameSyntax>().FirstOrDefault();

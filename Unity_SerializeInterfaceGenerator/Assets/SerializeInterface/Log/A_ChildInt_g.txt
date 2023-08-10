@@ -1,2 +1,5 @@
+
+Base Type Full Name: SerializeInterface.GenericParent.Parent<int>
 parent fields: 1
-parent fields is generic
+parent fields is genericgenericInfo: Generic Identifier: m_Value
+ Generic Value Full Name: SerializeInterface.GenericParent.IGeneric<System.Int32>

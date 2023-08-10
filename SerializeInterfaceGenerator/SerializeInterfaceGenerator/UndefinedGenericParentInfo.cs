@@ -4,23 +4,20 @@ namespace SerializeInterfaceGenerator
 {
     public readonly struct UndefinedGenericParentInfo
     {
-        public readonly string GenericIdentifier;
-        public readonly string GenericValueFullName;
-        public readonly string GenericFieldIdentifierName;
+        public readonly string FieldName;
+        public readonly string GenericFullName;
         
-        public UndefinedGenericParentInfo(string genericIdentifier, string genericValueFullName, string genericFieldIdentifierName)
+        public UndefinedGenericParentInfo(string fieldName, string genericFullName)
         {
-            this.GenericIdentifier = genericIdentifier;
-            this.GenericValueFullName = genericValueFullName;
-            this.GenericFieldIdentifierName = genericFieldIdentifierName;
+            this.FieldName = fieldName;
+            this.GenericFullName = genericFullName;
         }
 
         public override string ToString()
         {
             return
-                $"Generic Identifier: {GenericIdentifier}\n " +
-                $"Generic Value Full Name: {GenericValueFullName}\n " +
-                $"Generic Field Identifier Name: {GenericFieldIdentifierName}";
+                $"Generic Identifier: {FieldName}\n " +
+                $"Generic Value Full Name: {GenericFullName}";
         }
     }
 }
