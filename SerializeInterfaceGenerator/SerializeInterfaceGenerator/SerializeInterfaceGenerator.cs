@@ -14,18 +14,8 @@ using SerializeInterfaceGenerator;
 [Generator]
 public class SerializedInterfaceGenerator : ISourceGenerator
 {
-//     private const string AttributeText = @"
-// using System;
-//
-// [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-// internal class SerializeInterfaceAttribute : Attribute
-// {
-// }";
-
     public void Initialize(GeneratorInitializationContext context)
     {
-        // context.RegisterForPostInitialization
-        //     (i => i.AddSource("SerializeInterfaceAttribute_g.cs", AttributeText));
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
@@ -40,10 +30,8 @@ public class SerializedInterfaceGenerator : ISourceGenerator
             classValidator.ValidateClassOrReactiveSystem();
         }
     }
-    
 
-
-    public static void PrintOutputToPath(string source, string fileId)
+    public static void CreateLog(string source, string fileId)
     {
         var outputDir =
             $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\";
@@ -53,6 +41,19 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         
         var outputPath = $"{outputDir}{fileId}_g.txt";
         File.WriteAllText(outputPath, source.ToString());
+    }
+
+    public static void AppendLog(string source, string fileId)
+    {
+        var outputDir =
+            $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\";
+
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+        
+        var outputPath = $"{outputDir}{fileId}_g.txt";
+        
+        File.AppendAllText(outputPath, source.ToString());
     }
 
     internal class SyntaxReceiver : ISyntaxReceiver

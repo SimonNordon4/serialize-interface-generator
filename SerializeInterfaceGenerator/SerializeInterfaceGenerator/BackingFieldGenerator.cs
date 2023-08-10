@@ -122,8 +122,6 @@ namespace SerializeInterfaceGenerator
             _interfaceFullName = interfaceFullName;
 
             #endregion
-
-            // PrintOutput(ToString());
         }
 
 

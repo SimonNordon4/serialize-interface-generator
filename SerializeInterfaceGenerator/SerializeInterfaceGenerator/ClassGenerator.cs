@@ -13,7 +13,6 @@ namespace SerializeInterfaceGenerator
         private readonly GeneratorExecutionContext _context;
         private readonly SemanticModel _semanticModel;
         private readonly FieldDeclarationSyntax[] _validFieldDeclarations;
-        private readonly IFieldSymbol[] _genericParentFields;
         private readonly string _classNameSpace;
         private readonly string _className;
         private readonly bool _printOutput;
@@ -29,24 +28,8 @@ namespace SerializeInterfaceGenerator
                 .FirstOrDefault()
                 ?.Name.ToString();
             _className = validator.ClassDeclaration.Identifier.Text;
-
-            if (validator.IsParentClassGeneric)
-            {
-                _genericParentFields = validator.ParentNamedTypeSymbol?.GetMembers()
-                    .OfType<IFieldSymbol>()
-                    .Where(member => member.GetAttributes().Any(at => at.AttributeClass.Name == "SerializeInterface") &&
-                                     member.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
-                    .ToArray() ?? Array.Empty<IFieldSymbol>();
-            }
-
-            _genericParentFields = Array.Empty<IFieldSymbol>();
-
             _printOutput = printOutput;
         }
-
-
-
-
 
         public void GenerateClass()
         {
@@ -58,6 +41,10 @@ namespace SerializeInterfaceGenerator
             
             foreach (var field in _validFieldDeclarations)
             {
+                // We don't want to serialize <T> fields. That will be done in the children.
+                if(IsFieldIdentifierGeneric(field))
+                    continue;
+                
                 var fieldGenerator = new BackingFieldGenerator(_semanticModel,field);
                backingFieldSource.Append(fieldGenerator.GenerateBackingField(indent));
                afterDeserializeSource.Append(fieldGenerator.GenerateOnAfterDeserialization(indent));
@@ -119,41 +106,43 @@ namespace SerializeInterfaceGenerator
                 classSource.AppendLine("}");
             }
 
-            if(_printOutput) PrintOutput(classSource.ToString());
+            if(_printOutput) SerializedInterfaceGenerator.CreateLog(classSource.ToString(), _className);
             
             _context.AddSource($"{_className}_g.cs", SourceText.From(classSource.ToString(), Encoding.UTF8));
         }
 
-        private void GenerateClassWithGenericParent()
+        /// <summary>
+        /// Determines whether or not a field is an Undefined Generic with Identifier. (i.e. IGeneric T)
+        /// </summary>
+        private static bool IsFieldIdentifierGeneric(FieldDeclarationSyntax field)
         {
-            // // check if the parent of the class is a generic class
-            // // if it is, we need to add the generic type to the class name
-            // var parentClassDeclaration = _classDeclaration
-            //     .AncestorsAndSelf()
-            //     .OfType<ClassDeclarationSyntax>()
-            //     .Skip(1)
-            //     .FirstOrDefault();
-            //
-            // if (parentClassDeclaration?.TypeParameterList?.Parameters.Count > 0)
-            // {
-            //     var parentGenericType = parentClassDeclaration.TypeParameterList.Parameters.First();
-            //     
-            //     // Get all parent fields that are marked with the SerializeInterface attribute, generic and use the same argument as the parent.
-            //     _parentFieldDeclarations = parentClassDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-            //         .Where(f => f.AttributeLists.Any(
-            //                         a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface"))
-            //                     && f.Declaration.Type is GenericNameSyntax genericType
-            //                     && genericType.TypeArgumentList.Arguments.Any(arg => arg.ToString() == parentGenericType.Identifier.Text)) // Compare with parent's generic type
-            //         .ToArray();
-            //     
-            //     _parentIsGenericWithGenericFields = _parentFieldDeclarations.Any();
-            // }
-            // else
-            // {
-            //     _parentFieldDeclarations = Array.Empty<FieldDeclarationSyntax>();
-            //     _parentIsGenericWithGenericFields = false;
-            //}
+            var fieldType = field.Declaration.Type;
+            var genericNameSyntax = fieldType.DescendantNodesAndSelf().OfType<GenericNameSyntax>().FirstOrDefault();
+            var typeArguments = genericNameSyntax?.TypeArgumentList.Arguments;
+
+            if (typeArguments == null) return false;
+            
+            foreach (var typeArgument in typeArguments)
+            {
+                if (!(typeArgument is IdentifierNameSyntax identifierType)) continue;
+
+                // If it's an IdentifierNameSyntax and represents a generic type parameter, it will be part of the TypeParameterList
+                var containingType = identifierType.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault();
+                var containingMethod =
+                    identifierType.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+
+                if (containingType?.TypeParameterList?.Parameters.Any(p =>
+                        p.Identifier.Text == identifierType.Identifier.Text) == true
+                    || containingMethod?.TypeParameterList?.Parameters.Any(p =>
+                        p.Identifier.Text == identifierType.Identifier.Text) == true)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
+
 
         private bool DoesClassContainList()
         {
@@ -172,11 +161,7 @@ namespace SerializeInterfaceGenerator
             return false;
         }
 
-        private void PrintOutput(string source)
-        {
-            var outputPath = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{_className}_g.txt";
-           System.IO.File.WriteAllText(outputPath, source);
-        }
+
         
     }
 }
