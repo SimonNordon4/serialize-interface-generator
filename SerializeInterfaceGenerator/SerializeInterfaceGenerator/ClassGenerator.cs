@@ -66,7 +66,7 @@ namespace SerializeInterfaceGenerator
             }
 
             classSource.AppendLine(
-                $"{indent}public partial class {_className} : MonoBehaviour, ISerializationCallbackReceiver");
+                $"{indent}public partial class {_className} : ISerializationCallbackReceiver");
             classSource.AppendLine($"{indent}{{");
 
             // Add all the backing fields.
@@ -91,9 +91,6 @@ namespace SerializeInterfaceGenerator
             classSource.Append("\n");
             classSource.AppendLine($"{indent}    }}");
             classSource.Append("\n");
-            
-            // Add all the instantiate methods to the bottom of the class.
-            // classSource.Append(instantiateMethodSource);
 
             classSource.AppendLine($"{indent}}}");
 
@@ -103,40 +100,9 @@ namespace SerializeInterfaceGenerator
                 classSource.AppendLine("}");
             }
 
-            if(_printOutput) PrintOutput(classSource.ToString());
+            if(_printOutput) SerializedInterfaceGenerator.CreateLog(classSource.ToString(),_className);
             
             _context.AddSource($"{_className}_g.cs", SourceText.From(classSource.ToString(), Encoding.UTF8));
-        }
-
-        private void GenerateClassWithGenericParent()
-        {
-            // // check if the parent of the class is a generic class
-            // // if it is, we need to add the generic type to the class name
-            // var parentClassDeclaration = _classDeclaration
-            //     .AncestorsAndSelf()
-            //     .OfType<ClassDeclarationSyntax>()
-            //     .Skip(1)
-            //     .FirstOrDefault();
-            //
-            // if (parentClassDeclaration?.TypeParameterList?.Parameters.Count > 0)
-            // {
-            //     var parentGenericType = parentClassDeclaration.TypeParameterList.Parameters.First();
-            //     
-            //     // Get all parent fields that are marked with the SerializeInterface attribute, generic and use the same argument as the parent.
-            //     _parentFieldDeclarations = parentClassDeclaration.DescendantNodes().OfType<FieldDeclarationSyntax>()
-            //         .Where(f => f.AttributeLists.Any(
-            //                         a => a.Attributes.Any(at => at.Name.ToString() == "SerializeInterface"))
-            //                     && f.Declaration.Type is GenericNameSyntax genericType
-            //                     && genericType.TypeArgumentList.Arguments.Any(arg => arg.ToString() == parentGenericType.Identifier.Text)) // Compare with parent's generic type
-            //         .ToArray();
-            //     
-            //     _parentIsGenericWithGenericFields = _parentFieldDeclarations.Any();
-            // }
-            // else
-            // {
-            //     _parentFieldDeclarations = Array.Empty<FieldDeclarationSyntax>();
-            //     _parentIsGenericWithGenericFields = false;
-            //}
         }
 
         private bool DoesClassContainList()
@@ -155,12 +121,5 @@ namespace SerializeInterfaceGenerator
 
             return false;
         }
-
-        private void PrintOutput(string source)
-        {
-            var outputPath = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{_className}_g.txt";
-           System.IO.File.WriteAllText(outputPath, source);
-        }
-        
     }
 }
