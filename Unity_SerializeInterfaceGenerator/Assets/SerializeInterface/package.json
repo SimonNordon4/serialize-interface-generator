@@ -1,5 +1,5 @@
 ﻿{
-    "name": "com.SimonNordon4.SerializeInterface",
+    "name": "com.simonnordon.serializeinterface",
     "version": "1.0.0",
     "displayName": "Serialize Interface",
     "description": "A Unity package that serializes interfaces, designed to work with Unity versions that support Roslyn source generators.",
