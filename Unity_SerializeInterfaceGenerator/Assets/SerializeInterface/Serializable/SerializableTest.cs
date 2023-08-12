@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace SerializeInterface.Serializable
 {
-    public class DrawInterfaceAttribute : PropertyAttribute
-    {
-    }
-
     public partial class SerializableTest : MonoBehaviour
     {
         public int testInt;
@@ -21,7 +17,7 @@ namespace SerializeInterface.Serializable
 
     public partial class SerializableTest : ISerializationCallbackReceiver
     {
-        [SerializeReference,DrawInterface] public ITest TestSerialized = new TestA();
+        [SerializeReference, DrawInterface] public ITest TestSerialized;
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
@@ -42,6 +38,7 @@ namespace SerializeInterface.Serializable
     public class TestA : ITest
     {
         public int testInt = 1;
+        public float testFloat = 1.0f;
         public void Test()
         {
             Debug.Log("TestA");

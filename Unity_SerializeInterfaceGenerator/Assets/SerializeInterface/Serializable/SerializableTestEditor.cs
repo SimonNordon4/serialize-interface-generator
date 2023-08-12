@@ -13,65 +13,63 @@ using UnityEngine;
     //     
     //     private void OnEnable()
     //     {
-    //         m_TestSerializedProperty = serializedObject.FindProperty("TestSerialized");
+    //         m_TestSerializedProperty = serializedObject.FindProperty("testListSerialized");
     //     }
     //
     //     public override void OnInspectorGUI()
     //     {
-    //         DrawDefaultInspector();
-    //
-    //
     //         serializedObject.Update();
-    //         EditorGUI.BeginChangeCheck();
-    //         EditorGUILayout.PropertyField(m_TestSerializedProperty, new GUIContent("Your Property Name"), false);
+    //
+    //         DrawDefaultInspector();
     //         
-    //         if (EditorGUI.EndChangeCheck())
+    //         // Get every field in the class
+    //         var fields = target.GetType().GetFields();
+    //
+    //         foreach (var field in fields)
     //         {
-    //             serializedObject.ApplyModifiedProperties();
+    //             var property = serializedObject.FindProperty(field.Name);
+    //             if (property == null) continue;
+    //             EditorGUILayout.PropertyField(property);
     //         }
     //         
-    //         if (GUILayout.Button("Test"))
-    //         {
-    //             var property = serializedObject.FindProperty("TestSerialized");
-    //             var instance = new TestA();
-    //             property.managedReferenceValue = instance;
-    //         }
-    //         
-    //         // Apply changes to the serializedProperty - always do this in the end of OnInspectorGUI.
     //         serializedObject.ApplyModifiedProperties();
     //     }
     // }
 
 
 [CustomPropertyDrawer(typeof(DrawInterfaceAttribute))]
-public class DrawInterfaceDrawer : PropertyDrawer
+public class TestDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        // draw a box around the property
-        GUI.Box(position, GUIContent.none);
-        // get the property height
-        var height = EditorGUI.GetPropertyHeight(property, label, true);
-        // draw the property field
-        EditorGUI.PropertyField(position, property, label, true);
-        
-        if (property.managedReferenceValue == null)
-        {
-            if (GUILayout.Button("Add New"))
-            {
-                var newValue = Activator.CreateInstance(typeof(TestA));
-                property.managedReferenceValue = newValue;
-            }
+        // Determine if the property is expanded
+        bool isExpanded = property.isExpanded;
 
-            return;
-        }
-        
-        if (GUILayout.Button("Remove"))
+        // Get the standard height
+        float standardHeight = EditorGUI.GetPropertyHeight(property);
+
+        label.text = property.displayName;
+
+        // Draw the property itself
+        EditorGUI.PropertyField(new Rect(position.x, position.y, position.width - 20f, standardHeight), property, label, true);
+
+        string buttonLabel = property.managedReferenceValue == null ? "+" : "x";
+        if (GUI.Button(new Rect(position.x + position.width - 20f, position.y, 20f, EditorGUIUtility.singleLineHeight), buttonLabel))
         {
-            property.managedReferenceValue = null;
+            if (property.managedReferenceValue == null)
+            {
+                property.managedReferenceValue = Activator.CreateInstance(typeof(TestA));
+            }
+            else
+            {
+                property.managedReferenceValue = null;
+            }
         }
-        // apply
-        property.serializedObject.ApplyModifiedProperties();
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        return EditorGUI.GetPropertyHeight(property, label, true);
     }
 }
 
