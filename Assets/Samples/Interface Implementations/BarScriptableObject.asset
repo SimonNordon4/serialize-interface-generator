@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 458455264f4099c43b06297a3ec978e2, type: 3}
   m_Name: BarScriptableObject
   m_EditorClassIdentifier: 
-  <BarMessage>k__BackingField: 
+  <BarMessage>k__BackingField: Hi from Bar Scriptable Object

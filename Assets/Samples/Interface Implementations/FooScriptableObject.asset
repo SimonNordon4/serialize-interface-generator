@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e0ec3031b577094c87caa14a52dd28c, type: 3}
   m_Name: FooScriptableObject
   m_EditorClassIdentifier: 
-  <FooValue>k__BackingField: 0
+  <FooValue>k__BackingField: 10

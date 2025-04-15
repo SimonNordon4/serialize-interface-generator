@@ -138,7 +138,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &83842589
 Transform:
   m_ObjectHideFlags: 0
@@ -166,8 +166,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b83bfd88397d59645a0f7f31973e6f3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fooListSerialized: []
-  _barListSerialized: []
+  _fooListSerialized:
+  - {fileID: 6116215642482145737}
+  - {fileID: 11400000, guid: 5f4fb1e8972dfc545b20c40c212689c3, type: 2}
+  - {fileID: 5853666333081207358, guid: f885ce983c064254bbde4eb4ff986385, type: 3}
+  _barListSerialized:
+  - {fileID: 3580684189695731947}
+  - {fileID: 11400000, guid: 00564c0a90d16714fb69b489593df2d5, type: 2}
+  - {fileID: 8246398801884424926, guid: f632e5a1abfd5b24b89932f36af5817c, type: 3}
 --- !u!1 &204321786
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,6 +185,7 @@ GameObject:
   - component: {fileID: 204321789}
   - component: {fileID: 204321788}
   - component: {fileID: 204321787}
+  - component: {fileID: 204321790}
   m_Layer: 0
   m_Name: Generic
   m_TagString: Untagged
@@ -227,6 +234,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &204321790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 204321786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98adda58ea1c42c699900239dd90b76b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _valueSerialized: {fileID: 204321788}
 --- !u!1 &272753517
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,7 +545,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1049860351
 Transform:
   m_ObjectHideFlags: 0
@@ -553,8 +573,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9abebce60872143bcb5f18c9694667, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fooSerialized: {fileID: 0}
-  _barSerialized: {fileID: 0}
+  _fooSerialized: {fileID: 11400000, guid: 5f4fb1e8972dfc545b20c40c212689c3, type: 2}
+  _barSerialized: {fileID: 11400000, guid: 00564c0a90d16714fb69b489593df2d5, type: 2}
 --- !u!1 &1186988594
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,7 +859,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1644890712
 Transform:
   m_ObjectHideFlags: 0
@@ -871,7 +891,8 @@ MonoBehaviour:
   _stringGenericSerialized: {fileID: 204321787}
   _listGenericSerialized:
   - {fileID: 204321788}
-  _nestedGenericSerialized: {fileID: 0}
+  - {fileID: 204321788}
+  _nestedGenericSerialized: {fileID: 204321790}
 --- !u!1 &1769573840
 GameObject:
   m_ObjectHideFlags: 0
@@ -956,7 +977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2134685952
 Transform:
   m_ObjectHideFlags: 0
@@ -984,8 +1005,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7979161c23d0f564498be66046fb40b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fooPrefabSerialized: {fileID: 0}
-  _barPrefabSerialized: {fileID: 0}
+  _fooPrefabSerialized: {fileID: 5853666333081207358, guid: f885ce983c064254bbde4eb4ff986385, type: 3}
+  _barPrefabSerialized: {fileID: 8246398801884424926, guid: f632e5a1abfd5b24b89932f36af5817c, type: 3}
 --- !u!114 &3580684189695731947
 MonoBehaviour:
   m_ObjectHideFlags: 0

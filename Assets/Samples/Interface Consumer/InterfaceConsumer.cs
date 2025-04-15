@@ -7,7 +7,6 @@ namespace SerializeInterface.Samples
     {
         [SerializeInterface] private IFoo _foo;
         [SerializeInterface] private IBar _bar;
-        //Test
         
         private void Start()
         { 

@@ -8,11 +8,10 @@ using SerializeInterfaceGenerator;
 [Generator]
 public class SerializedInterfaceGenerator : ISourceGenerator
 {
+
     public void Initialize(GeneratorInitializationContext context)
     {
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
-        
-        CreateLog("Initialize generated code, syntax receiver registered", "");
     }
 
     public void Execute(GeneratorExecutionContext context)
