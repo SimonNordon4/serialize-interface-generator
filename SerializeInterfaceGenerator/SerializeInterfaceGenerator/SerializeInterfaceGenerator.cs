@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
@@ -25,31 +24,7 @@ public class SerializedInterfaceGenerator : ISourceGenerator
             classValidator.ValidateClass();
         }
     }
-
-    public static void AppendLog(string source, string fileId)
-    {
-        var outputDir = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\";
-        
-        if(!Directory.Exists(outputDir))
-            Directory.Delete(outputDir, true);
-        
-        var outputPath =
-            $"{outputDir}{fileId}_g.txt";
-        File.AppendAllText(outputPath, source.ToString());
-    }
-
-    public static void CreateLog(string source, string fileId)
-    {
-        var outputDir = $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\Log\";
-        
-        if(!Directory.Exists(outputDir))
-            Directory.Delete(outputDir, true);
-        
-        var outputPath =
-            $"{outputDir}{fileId}_g.txt";
-        File.WriteAllText(outputPath, source.ToString());
-    }
-
+    
     internal class SyntaxReceiver : ISyntaxReceiver
     {
         public List<ClassDeclarationSyntax> Classes { get; } = new List<ClassDeclarationSyntax>();

@@ -122,8 +122,6 @@ namespace SerializeInterfaceGenerator
             _interfaceFullName = interfaceFullName;
 
             #endregion
-
-            // PrintOutput(ToString());
         }
 
 
@@ -177,13 +175,6 @@ namespace SerializeInterfaceGenerator
             if (_isReadOnly && !_isInitialized) return false;
 
             return true;
-        }
-
-        private void PrintOutput(string toPrint)
-        {
-            var outputPath =
-                $@"E:\repos\serialize-interface-generator\Unity_SerializeInterfaceGenerator\Assets\SerializeInterface\{_backingFieldIdentifier}_g.txt";
-            System.IO.File.WriteAllText(outputPath, toPrint);
         }
 
         public override string ToString()

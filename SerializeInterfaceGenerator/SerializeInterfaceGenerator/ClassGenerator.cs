@@ -13,9 +13,8 @@ namespace SerializeInterfaceGenerator
         private readonly FieldDeclarationSyntax[] _fieldDeclarations;
         private readonly string _classNameSpace;
         private readonly string _className;
-        private readonly bool _printOutput;
 
-        public ClassGenerator(ClassValidator validator, bool printOutput = false)
+        public ClassGenerator(ClassValidator validator)
         {
             _context = validator.Context;
             _semanticModel = validator.Context.Compilation.GetSemanticModel(validator.ClassDeclaration.SyntaxTree);
@@ -26,7 +25,6 @@ namespace SerializeInterfaceGenerator
                 .FirstOrDefault()
                 ?.Name.ToString();
             _className = validator.ClassDeclaration.Identifier.Text;
-            _printOutput = printOutput;
         }
 
 
@@ -98,8 +96,6 @@ namespace SerializeInterfaceGenerator
                 classSource.AppendLine("}");
             }
 
-            if(_printOutput) SerializedInterfaceGenerator.CreateLog(classSource.ToString(),_className);
-            
             _context.AddSource($"{_className}_g.cs", SourceText.From(classSource.ToString(), Encoding.UTF8));
         }
 

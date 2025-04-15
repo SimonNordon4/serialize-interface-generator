@@ -96,13 +96,26 @@ Will source generate the partial class:
 ```csharp
 public partial class MyClass : MonoBehaviour, ISerializationCallbackReceiver
 {
-    void OnBeforeSerialize()
-    {
+    [ValidateInterface(typeof(IFoo))]
+    private UnityEngine.Object fooSerialized;
 
-    }
+    // Required by interface.
+    void OnBeforeSerialize(){}
 
     void OnAfterDeserialize()
     {
-        
+        foo = fooSerialized as IFoo
     }
 }
+```
+
+As well as the source generator DLL we also need to include ```SerializeInterfaceAttribute.cs``` so that Unity recognizes the attribute, as well as ```ValidateInterfaceAttribute.cs``` which is what the source generator uses to ensure the correct interface is being applied.
+
+
+
+## Future Improvements
+
+- Improved Debugging. (We should figure out how to attach a debugger to a source generator as it's running, and more reliably view the output)
+- Support for properties via ```[field:SerializeInterface]``` usage.
+- Support for plain C# classes (This will require some kind of dependency injection framework)
+

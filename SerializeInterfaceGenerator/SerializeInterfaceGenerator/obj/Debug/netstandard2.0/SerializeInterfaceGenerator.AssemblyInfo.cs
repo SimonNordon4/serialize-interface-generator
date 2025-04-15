@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SerializeInterfaceGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d82c778cd509bc622838f82d069dfa5003cd1e82")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fccef75d1105bcae46dee6e3cf2a7e8c57aaf32d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SerializeInterfaceGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SerializeInterfaceGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
