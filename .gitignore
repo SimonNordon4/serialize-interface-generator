@@ -78,3 +78,7 @@ SerializeInterfaceGenerator/.idea/*
 Assets/Serializable.meta
 Assets/Serializable/Serializable.unity
 Assets/Serializable/Serializable.unity.meta
+SerializeInterfaceGenerator/.idea/indexLayout.xml
+SerializeInterfaceGenerator/.idea/indexLayout.xml
+SerializeInterfaceGenerator/.idea/projectSettingsUpdater.xml
+/SerializeInterfaceGenerator/SerializeInterfaceGenerator/obj

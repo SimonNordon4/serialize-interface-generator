@@ -10,18 +10,16 @@
         "projectUniqueName": "E:\\repos\\serialize-interface-generator\\SerializeInterfaceGenerator\\SerializeInterfaceGenerator\\SerializeInterfaceGenerator.csproj",
         "projectName": "SerializeInterfaceGenerator",
         "projectPath": "E:\\repos\\serialize-interface-generator\\SerializeInterfaceGenerator\\SerializeInterfaceGenerator\\SerializeInterfaceGenerator.csproj",
-        "packagesPath": "C:\\Users\\61426\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\simon\\.nuget\\packages\\",
         "outputPath": "E:\\repos\\serialize-interface-generator\\SerializeInterfaceGenerator\\SerializeInterfaceGenerator\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\61426\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\simon\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netstandard2.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -34,7 +32,13 @@
           "warnAsError": [
             "NU1605"
           ]
-        }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "all"
+        },
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "netstandard2.0": {
@@ -61,11 +65,12 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Users\\simon\\.dotnet\\sdk\\9.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

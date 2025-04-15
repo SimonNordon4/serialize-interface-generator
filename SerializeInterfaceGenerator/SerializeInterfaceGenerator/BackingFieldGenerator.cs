@@ -125,7 +125,7 @@ namespace SerializeInterfaceGenerator
 
             
             // Used for debugging purposes only.
-            // PrintOutput(ToString());
+            PrintOutput(ToString());
         }
 
 

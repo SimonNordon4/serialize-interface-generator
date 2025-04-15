@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
-using System.Text;
 using System.Linq;
-using System.Reflection;
-using System.Security;
 using SerializeInterfaceGenerator;
 
 [Generator]
@@ -17,6 +11,8 @@ public class SerializedInterfaceGenerator : ISourceGenerator
     public void Initialize(GeneratorInitializationContext context)
     {
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+        
+        CreateLog("Initialize generated code, syntax receiver registered", "");
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -53,8 +49,6 @@ public class SerializedInterfaceGenerator : ISourceGenerator
         var outputPath =
             $"{outputDir}{fileId}_g.txt";
         File.WriteAllText(outputPath, source.ToString());
-        
-        
     }
 
     internal class SyntaxReceiver : ISyntaxReceiver
