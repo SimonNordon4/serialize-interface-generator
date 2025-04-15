@@ -14,7 +14,6 @@ using SerializeInterfaceGenerator;
 [Generator]
 public class SerializedInterfaceGenerator : ISourceGenerator
 {
-
     public void Initialize(GeneratorInitializationContext context)
     {
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());

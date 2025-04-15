@@ -123,6 +123,8 @@ namespace SerializeInterfaceGenerator
 
             #endregion
 
+            
+            // Used for debugging purposes only.
             // PrintOutput(ToString());
         }
 

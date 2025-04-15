@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: daf47276470949789d1bda4a2c29c920, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e0ec3031b577094c87caa14a52dd28c, type: 3}
   m_Name: FooScriptableObject
   m_EditorClassIdentifier: 
-  <FooValue>k__BackingField: 2
+  <FooValue>k__BackingField: 0
