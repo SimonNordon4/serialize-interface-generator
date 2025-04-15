@@ -1,1 +1,0 @@
-TestListGUI is derived from generic: False

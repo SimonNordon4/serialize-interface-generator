@@ -1,1 +1,0 @@
-PlaymodeTestsControllerSettings is derived from generic: False

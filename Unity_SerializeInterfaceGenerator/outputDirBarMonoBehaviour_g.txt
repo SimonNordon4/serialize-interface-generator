@@ -1,1 +1,0 @@
-BarMonoBehaviour is derived from generic: False

@@ -1,1 +1,0 @@
-ContentSizeFitter is derived from generic: False

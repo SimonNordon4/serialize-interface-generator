@@ -1,1 +1,0 @@
-RemoteTestRunController is derived from generic: True

@@ -1,1 +1,0 @@
-InterfacePrefabConsumer is derived from generic: False

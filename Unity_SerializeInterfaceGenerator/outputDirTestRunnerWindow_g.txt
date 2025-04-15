@@ -1,1 +1,0 @@
-TestRunnerWindow is derived from generic: False

@@ -1,1 +1,0 @@
-BaseMeshEffect is derived from generic: False

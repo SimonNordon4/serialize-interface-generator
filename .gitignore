@@ -2,13 +2,13 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
-Unity_SerializeInterfaceGenerator/[Ll]ibrary/
-Unity_SerializeInterfaceGenerator/[Tt]emp/
-Unity_SerializeInterfaceGenerator/[Oo]bj/
-Unity_SerializeInterfaceGenerator/[Bb]uild/
-Unity_SerializeInterfaceGenerator/[Bb]uilds/
-Unity_SerializeInterfaceGenerator/[Ll]ogs/
-Unity_SerializeInterfaceGenerator/[Uu]ser[Ss]ettings/
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -25,6 +25,9 @@ Unity_SerializeInterfaceGenerator/[Uu]ser[Ss]ettings/
 
 # Visual Studio cache directory
 .vs/
+
+# Rider directory
+.idea/
 
 # Gradle cache directory
 .gradle/
@@ -71,5 +74,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-Unity_SerializeInterfaceGenerator/Library/*
-Unity_SerializeInterfaceGenerator/Assets/Plugins/UniRx/*
+SerializeInterfaceGenerator/.idea/*
+Assets/Serializable.meta
+Assets/Serializable/Serializable.unity
+Assets/Serializable/Serializable.unity.meta

@@ -1,1 +1,0 @@
-InputField is derived from generic: False

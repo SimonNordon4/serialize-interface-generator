@@ -1,1 +1,0 @@
-EditModeRunnerCallback is derived from generic: False

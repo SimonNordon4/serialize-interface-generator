@@ -1,1 +1,0 @@
-AspectRatioFitter is derived from generic: False

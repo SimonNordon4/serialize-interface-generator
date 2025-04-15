@@ -1,1 +1,0 @@
-CoverageEventData is derived from generic: True

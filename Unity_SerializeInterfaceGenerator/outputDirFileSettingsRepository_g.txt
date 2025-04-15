@@ -1,1 +1,0 @@
-FileSettingsRepository is derived from generic: False

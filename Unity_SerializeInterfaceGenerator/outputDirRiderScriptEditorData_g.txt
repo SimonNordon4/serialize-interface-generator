@@ -1,1 +1,0 @@
-RiderScriptEditorData is derived from generic: True
